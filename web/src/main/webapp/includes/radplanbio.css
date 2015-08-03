@@ -1,0 +1,103 @@
+H1 {
+    color: #9E9E9C;
+}
+
+body {
+    margin-top: 0px;
+
+}
+
+.headerBar {
+    margin-top: 0px;
+    height: 20px;
+    width: 100%;
+    background: #3890D9;
+}
+.headerText {
+    margin-left: 51%;
+    text-align: left;
+    color: #FFFFFF;
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+
+#OCLogoBar {
+    display: inline-block;
+    margin-right: 360px;
+    padding-bottom: 30px;
+
+}
+
+#filler {
+    width : 94px;
+}
+
+#logoBar {
+    margin-left : auto;
+    margin-right: auto;
+    margin-top: -60px;
+    *margin-top: -20px;
+    text-align: center;
+    overflow: hidden;
+    width: 600px;
+    order-collapse: separate;
+    border-spacing: 10px;
+    *border-collapse: expression('separate', cellSpacing = '0px');
+}
+
+a img {
+    border: 0;
+}
+
+body.login_BG {
+    background: url("../images/login_BG.gif") no-repeat top center;
+    background-attachment: fixed;
+    height: auto;
+    width: auto;
+}
+
+.loginBoxes {
+    margin-bottom: 15px;
+}
+
+
+#logoRadPlanBio {
+    margin-top:5px;
+    display: inline-block;
+    padding-right: 85px;
+    float: left;
+    width : 270px;
+}
+
+
+#welcomeTextRadPlanBio{
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 11pt;
+    width: 270px;
+    text-align: left;
+    padding-top: 35px;
+    text-align: justify;
+}
+
+.welcomeTextOC {
+    margin-left:10px;
+    width: 14em;
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 8pt;
+    padding-bottom: 20px;
+    overflow: hidden;
+
+}
+
+#environmentName {
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 20pt;
+    color: red;
+    padding-bottom: 16px;
+}
+
+.browserSupport {
+    margin-left: 125px;
+}
