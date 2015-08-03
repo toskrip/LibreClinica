@@ -25,6 +25,8 @@
 <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
+<%-- RadPlanBio style--%>
+<link rel="stylesheet" href="/OpenClinica/includes/radplanbio.css" type="text/css">
 </head>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -38,23 +40,46 @@
 <%--</c:choose>--%>
 
 <body class="login_BG" onLoad="document.getElementById('username').focus();">
+    <!-- RadPlanBio -->
+    <div class="headerBar">
+        <div class="headerText">RadPlanBio - radiotherapy clinical research IT infrastructure</div>
+    </div>
+
     <div class="login_BG">
     <center>
+        <table id="logoBar">
+            <tbody>
+            <tr>
+                <td>
+                    <img src="/OpenClinica/images/dktk-logo.jpg" alt="DKTK-logo" width="300px"/>
+                    <p>Welcome to OpenClinica clinical trial software</p>
+                </td>
+
+                <td id="filler">&nbsp;</td>
+                <td id="welcomeTextRadPlanBio">
+                    <p>CTMS and EDC for RadPlanBio</p>
+                    <p>
+                        The RadPlanBio platform is a web-based solution for exchanging and sharing medical cancer treatment research data in order to allow multi-centric studies. The idea is to deliver a study management and electronic data capture system with special extensions dedicated to safe upload of medical DICOM files.
+                    </p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
     <!-- OpenClinica logo -->
-	<%String ua = request.getHeader( "User-Agent" );
-	String temp = "";
-	String iev = "";
-	if( ua != null && ua.indexOf( "MSIE" ) != -1 ) {
-		temp = ua.substring(ua.indexOf( "MSIE" ),ua.length());
-		iev = temp.substring(4, temp.indexOf(";"));
-		iev = iev.trim();
-	}
-	if(iev.length() > 1 && Double.valueOf(iev)<7) {%>
-	<div ID="OClogoIE6">&nbsp;</div>
-	<%} else {%>
-    <div ID="OClogo">&nbsp;</div>
-  	<%}%>
+	<%--<%String ua = request.getHeader( "User-Agent" );--%>
+	<%--String temp = "";--%>
+	<%--String iev = "";--%>
+	<%--if( ua != null && ua.indexOf( "MSIE" ) != -1 ) {--%>
+		<%--temp = ua.substring(ua.indexOf( "MSIE" ),ua.length());--%>
+		<%--iev = temp.substring(4, temp.indexOf(";"));--%>
+		<%--iev = iev.trim();--%>
+	<%--}--%>
+	<%--if(iev.length() > 1 && Double.valueOf(iev)<7) {%>--%>
+	<%--<div ID="OClogoIE6">&nbsp;</div>--%>
+	<%--<%} else {%>--%>
+    <%--<div ID="OClogo">&nbsp;</div>--%>
+  	<%--<%}%>--%>
     <!-- end OpenClinica logo -->
         <table width="720 px">
         <script type="text/javascript">
