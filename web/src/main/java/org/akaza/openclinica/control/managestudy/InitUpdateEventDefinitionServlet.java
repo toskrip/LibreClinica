@@ -162,9 +162,13 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
         URL pManageUrl = new URL(portalURL);
     
     ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();    
-    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
-         String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                    + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+    //Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+    //     String url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+    //            + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+
+        // Use identifier as host of study in participate
+        String url = pManageUrl.getProtocol() + "://" + currentStudy.getAbbreviatedIdentifier() + "." + pManageUrl.getHost()
+                + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
 
     	System.out.println("the url :  "+ url);
     	request.setAttribute("participantUrl",url+"/");

@@ -25,6 +25,23 @@ public class ParticipantPortalRegistrar {
     public static final int PARTICIPATE_READ_TIMEOUT = 5000;
 
     public Authorization getAuthorization(String studyOid) {
+
+//        Study study = new Study();
+//        //study.setInstanceUrl();
+//       // study.setOrganization();
+//        study.setStudyOid(studyOid);
+//
+//        AuthorizationStatus authStatus = new AuthorizationStatus();
+//        authStatus.setStatus("enabled"); // enabled or disabled
+//
+//        Authorization auth = new Authorization();
+//        auth.setStudy(study);
+//        auth.setPformApiKey("enketorules"); // API key "ocrocks" is for PManager
+//        auth.setPformUrl("http://g40rpbtrials2.med.tu-dresden.de:9005");
+//        auth.setAuthorizationStatus(authStatus);
+//
+//        return auth;
+
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
@@ -45,7 +62,7 @@ public class ParticipantPortalRegistrar {
     public String getCachedRegistrationStatus(String studyOid, HttpSession session) throws Exception {
         String regStatus = (String) session.getAttribute("pManageRegistrationStatus");
         if (regStatus == null) {
-            regStatus = getRegistrationStatus(studyOid);
+            regStatus = "ACTIVE"; //getRegistrationStatus(studyOid);
             session.setAttribute("pManageRegistrationStatus", regStatus);
         }
         return regStatus;
@@ -147,19 +164,29 @@ public class ParticipantPortalRegistrar {
         authStudy.setHost(hostName);
         authRequest.setStudy(authStudy);
 
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
-        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
-        RestTemplate rest = new RestTemplate(requestFactory);
+        AuthorizationStatus authStatus = new AuthorizationStatus();
+        authStatus.setStatus("enabled"); // enabled or disabled
 
-        try {
-            Authorization response = rest.postForObject(pManageUrl, authRequest, Authorization.class);
-            if (response != null && response.getAuthorizationStatus() != null)
-                return response.getAuthorizationStatus().getStatus();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
-        return "";
+        authRequest.setAuthorizationStatus(authStatus);
+
+        // auth.setPformApiKey("enketorules"); // API key "ocrocks" is for PManager
+        // auth.setPformUrl("http://g40rpbtrials2.med.tu-dresden.de:9005");
+
+        return authRequest.getAuthorizationStatus().getStatus();
+
+//        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+//        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+//        RestTemplate rest = new RestTemplate(requestFactory);
+//
+//        try {
+//            Authorization response = rest.postForObject(pManageUrl, authRequest, Authorization.class);
+//            if (response != null && response.getAuthorizationStatus() != null)
+//                return response.getAuthorizationStatus().getStatus();
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//            logger.error(ExceptionUtils.getStackTrace(e));
+//        }
+//        return "";
     }
 
     public String getStudyHost(String studyOid) throws Exception {

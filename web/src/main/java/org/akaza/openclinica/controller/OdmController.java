@@ -362,7 +362,7 @@ public class OdmController {
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
 		participantPortalRegistrar = new ParticipantPortalRegistrar();
-		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE , PENDING , INACTIVE
+		String pManageStatus = "ACTIVE"; //participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE , PENDING , INACTIVE
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
 		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);

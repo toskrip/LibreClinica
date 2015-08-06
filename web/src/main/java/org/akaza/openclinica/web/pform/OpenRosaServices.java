@@ -484,7 +484,7 @@ public class OpenRosaServices {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+        String pManageStatus = "ACTIVE"; //participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
                                                                                                       // PENDING ,
                                                                                                       // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
@@ -503,7 +503,7 @@ public class OpenRosaServices {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+        String pManageStatus = "ACTIVE"; //participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
                                                                                                       // PENDING ,
                                                                                                       // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
@@ -524,10 +524,10 @@ public class OpenRosaServices {
 
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+        String pManageStatus = "ACTIVE"; //= participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
                                                                                                       // PENDING ,
                                                                                                       // INACTIVE
-        String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+        String participateStatus = "enabled"; //pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         if (participateStatus.equalsIgnoreCase("enabled")

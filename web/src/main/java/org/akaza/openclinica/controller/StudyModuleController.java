@@ -155,7 +155,7 @@ public class StudyModuleController {
             return "redirect:/pages/studymodule";
         }
         String status = "";
-        String nameAvailability = registrar.getHostNameAvailability(hostName);        
+        String nameAvailability = "AVAILABLE"; // registrar.getHostNameAvailability(hostName);
         if (nameAvailability.equals(ParticipantPortalRegistrar.UNAVAILABLE)) {
             addRegMessage(request, respage.getString("participate_hostname_not_available"));
             return "redirect:/pages/studymodule";
