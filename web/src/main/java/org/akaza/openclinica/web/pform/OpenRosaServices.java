@@ -301,9 +301,11 @@ public class OpenRosaServices {
                 return null;
 
             PFormCache cache = PFormCache.getInstance(servletContext);
+            LOGGER.info("FORM_CONTEXT is :" + context) ;
             HashMap<String, String> userContext = cache.getSubjectContext(context);
-            
-            
+            if (userContext == null) {
+                LOGGER.info("Could not find form context");
+            }
             
             
             StudySubjectDAO ssdao = new StudySubjectDAO<String, ArrayList>(dataSource);

@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-db.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-service.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-scheduler.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/ws/client/client-config.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-spring.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-security.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-hibernate.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-email.xml</file>
+          <file>file://$MODULE_DIR$/src/main/resources/org/akaza/openclinica/applicationContext-core-timer.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
@@ -144,4 +161,3 @@
     <orderEntry type="library" name="Maven: org.apache.ws.commons.schema:XmlSchema:1.4.7" level="project" />
   </component>
 </module>
-
