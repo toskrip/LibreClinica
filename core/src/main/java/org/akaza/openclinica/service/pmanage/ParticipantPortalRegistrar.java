@@ -25,22 +25,10 @@ public class ParticipantPortalRegistrar {
     public static final int PARTICIPATE_READ_TIMEOUT = 5000;
 
     public Authorization getAuthorization(String studyOid) {
-
         Study study = new Study();
         study.setHost(studyOid); // Study identifier used as host in url enketo URL (I am registering each study in enketo with OID)
-//        //study.setInstanceUrl();
-//       // study.setOrganization();
-//        study.setStudyOid(studyOid);
-//
-//        AuthorizationStatus authStatus = new AuthorizationStatus();
-//        authStatus.setStatus("enabled"); // enabled or disabled
-//
         Authorization auth = new Authorization();
         auth.setStudy(study);
-
-//        auth.setPformApiKey("enketorules"); // API key "ocrocks" is for PManager
-//        auth.setPformUrl("http://g40rpbtrials2.med.tu-dresden.de:9005");
-//        auth.setAuthorizationStatus(authStatus);
 
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
@@ -49,9 +37,9 @@ public class ParticipantPortalRegistrar {
         RestTemplate rest = new RestTemplate(requestFactory);
 
         try {
-            //Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
-            //if (response.length > 0 && response[0].getAuthorizationStatus() != null)
-            //    return response[0];
+//            Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
+//            if (response.length > 0 && response[0].getAuthorizationStatus() != null)
+//                return response[0];
             return auth;
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -63,7 +51,8 @@ public class ParticipantPortalRegistrar {
     public String getCachedRegistrationStatus(String studyOid, HttpSession session) throws Exception {
         String regStatus = (String) session.getAttribute("pManageRegistrationStatus");
         if (regStatus == null) {
-            regStatus = "ACTIVE"; //getRegistrationStatus(studyOid);
+            //regStatus = getRegistrationStatus(studyOid);
+            regStatus = "ACTIVE";
             session.setAttribute("pManageRegistrationStatus", regStatus);
         }
         return regStatus;
@@ -170,9 +159,6 @@ public class ParticipantPortalRegistrar {
 
         authRequest.setAuthorizationStatus(authStatus);
 
-        // auth.setPformApiKey("enketorules"); // API key "ocrocks" is for PManager
-        // auth.setPformUrl("http://g40rpbtrials2.med.tu-dresden.de:9005");
-
         return authRequest.getAuthorizationStatus().getStatus();
 
 //        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
@@ -191,6 +177,7 @@ public class ParticipantPortalRegistrar {
     }
 
     public String getStudyHost(String studyOid) throws Exception {
+
         // I don't have any participate manager
         return "";
 

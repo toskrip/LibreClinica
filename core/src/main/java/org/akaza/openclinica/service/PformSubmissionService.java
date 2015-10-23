@@ -79,7 +79,7 @@ import org.xml.sax.InputSource;
  */
 /**
  * @author joekeremian
- *
+ * 
  */
 public class PformSubmissionService {
 
@@ -143,58 +143,16 @@ public class PformSubmissionService {
 		return inputUserName;
 	}
 
-	/**
-	 * Create User Account , insert in User Account table , also insert records in Authorities table
-	 *
-	 * @param userAccountBean
-	 * @param studyBean
-	 * @param studySubjectBean
-	 * @return
-	 * @throws Exception
-	 */
-     private UserAccountBean createUserAccount(UserAccountBean userAccountBean, StudyBean studyBean, StudySubjectBean
-      studySubjectBean) throws Exception { UserAccountBean rootUserAccount = getUserAccount("root"); UserAccountBean
-      createdUserAccountBean = new UserAccountBean(); createdUserAccountBean.setName(getInputUsername(studyBean,
-      studySubjectBean)); createdUserAccountBean.setFirstName(INPUT_FIRST_NAME);
-      createdUserAccountBean.setLastName(INPUT_LAST_NAME); createdUserAccountBean.setEmail(INPUT_EMAIL);
-      createdUserAccountBean.setInstitutionalAffiliation(INPUT_INSTITUTION);
-      createdUserAccountBean.setActiveStudyId(studyBean.getId()); String passwordHash = UserAccountBean.LDAP_PASSWORD;
-      createdUserAccountBean.setPasswd(passwordHash); createdUserAccountBean.setPasswdTimestamp(null);
-      createdUserAccountBean.setLastVisitDate(null); createdUserAccountBean.setActiveStudyId(studyBean.getId());
-      createdUserAccountBean.setStatus(Status.DELETED); createdUserAccountBean.setPasswdChallengeQuestion("");
-      createdUserAccountBean.setPasswdChallengeAnswer(""); createdUserAccountBean.setPhone("");
-      createdUserAccountBean.setOwner(rootUserAccount); createdUserAccountBean.setRunWebservices(false); Role r =
-      Role.RESEARCHASSISTANT2; createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyBean.getId(),
-      r, rootUserAccount); UserType type = UserType.get(2); createdUserAccountBean.addUserType(type);
-
-      createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean); //
-      authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName())); return userAccountBean; }
-
-	/**
-	 * Create StudyUserRole records
-	 *
-	 * @param createdUserAccountBean
-	 * @param studyId
-	 * @param r
-	 * @param rootUserAccount
-	 * @return
-	 */
-      private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r,
-      UserAccountBean rootUserAccount) { StudyUserRoleBean studyUserRole = new StudyUserRoleBean();
-      studyUserRole.setStudyId(studyId); studyUserRole.setRoleName(r.getName());
-      studyUserRole.setStatus(Status.AUTO_DELETED); studyUserRole.setOwner(rootUserAccount);
-      createdUserAccountBean.addRole(studyUserRole); return createdUserAccountBean; }
-
 	private int getCountCompletedEventCrfsInAStudyEvent(StudyEventBean seBean) {
 		int count = 0;
 		count = ecdao.findAllByStudyEventAndStatus(seBean, Status.UNAVAILABLE).size();
 		return count;
 	}
 
-	private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId , Integer studyId) {
+	private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId, Integer studyId) {
 		int count = 0;
 		edcdao = new EventDefinitionCRFDAO(ds);
-		count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId , studyId).size();
+		count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId, studyId).size();
 		return count;
 	}
 
@@ -205,10 +163,10 @@ public class PformSubmissionService {
 		return eventDefinitionCRFBean;
 	}
 
-	private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId , Integer studyId) {
+	private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId, Integer studyId) {
 		int count = 0;
 		edcdao = new EventDefinitionCRFDAO(ds);
-		count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId , studyId).size();
+		count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId, studyId).size();
 		return count;
 	}
 
@@ -273,6 +231,12 @@ public class PformSubmissionService {
 		return eventCrfBeanList;
 	}
 
+	// private ArrayList<ItemDataBean> getItemDataRecord(int itemDataId) {
+	// iddao = new ItemDataDAO(ds);
+	// ArrayList<ItemDataBean> itemDataBeanList = iddao.findAllByEventCRFId(eventCRFId);
+	// return itemDataBeanList;
+	// }
+
 	private ArrayList<ItemDataBean> getItemDataRecords(int eventCRFId) {
 		iddao = new ItemDataDAO(ds);
 		ArrayList<ItemDataBean> itemDataBeanList = iddao.findAllByEventCRFId(eventCRFId);
@@ -321,14 +285,14 @@ public class PformSubmissionService {
 		StudyBean studyBean = getStudy(studySubjectBean);
 		UserAccountBean userAccountBean = getUserAccount(getInputUsername(studyBean, studySubjectBean));
 		if (!userAccountBean.isActive() && studySubjectBean.isActive()) {
-			 userAccountBean = createUserAccount(userAccountBean, studyBean, studySubjectBean);
-//			logger.info("***  User Account Does Not Exist in the System  ***");
-//			errors.reject("  User Account Does Not Exist in the System  ");
-//			return errors;
+			userAccountBean = createUserAccount(userAccountBean, studyBean, studySubjectBean);
+			//logger.info("***  User Account Does Not Exist in the System  ***");
+			//errors.reject("  User Account Does Not Exist in the System  ");
+			//return errors;
 		}
-//		else {
-//			logger.info("***User Account already exist in the system***");
-//		}
+		//else {
+		//	logger.info("***User Account already exist in the system***");
+		//}
 
 		// Study Event Validation check (System must include events that are
 		// scheduled or started)
@@ -428,7 +392,7 @@ public class PformSubmissionService {
 	 * @return
 	 */
 	private ItemDataBean createItemData(ItemBean itemBean, String itemValue, Integer itemOrdinal, EventCRFBean eventCrfBean, StudyBean studyBean,
-			StudySubjectBean studySubjectBean) {
+										StudySubjectBean studySubjectBean) {
 		logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
 		ItemDataBean itemDataBean = new ItemDataBean();
 		itemDataBean.setItemId(itemBean.getId());
@@ -480,7 +444,7 @@ public class PformSubmissionService {
 	 * @return
 	 */
 	private EventCRFBean getCrfVersionCheck(String crfVersionOID, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean,
-			StudySubjectBean studySubjectBean) {
+											StudySubjectBean studySubjectBean) {
 		EventCRFBean eventCrfBean = null;
 		boolean isSameCrfVersion = false;
 		boolean isEventCrfInOC = false;
@@ -532,7 +496,7 @@ public class PformSubmissionService {
 	 * @return
 	 */
 	private EventCRFBean checkIfEventCrfInOC(boolean isEventCrfInOC, boolean isSameCrfVersion, String crfVersionOID, Errors errors, StudyBean studyBean,
-			StudyEventBean studyEventBean, StudySubjectBean studySubjectBean) {
+											 StudyEventBean studyEventBean, StudySubjectBean studySubjectBean) {
 		EventCRFBean eventCrfBean = null;
 		if (!isEventCrfInOC) {
 			// Execute Creating New Event Crf
@@ -545,13 +509,6 @@ public class PformSubmissionService {
 			// , event..
 			eventCrfBean = getEventCrf(crfVersionOID, studyEventBean, studySubjectBean).get(0); // ///////////////
 			logger.info("***  Existing EventCrf with same CRF Version  ***");
-			// If Item Data Exist in OC , then throw submission Failure
-			if (!getItemDataRecords(eventCrfBean.getId()).isEmpty()) {
-				logger.info("***Existing Item Data , No New Item Data is added***");
-				errors.reject("Existing Item Data , No New Item Data is added");
-				return null;
-			}
-
 		} else {
 			// If Another CRF version is tried to submit to OC for the same
 			// subject , event ..
@@ -574,7 +531,7 @@ public class PformSubmissionService {
 	 * @throws Exception
 	 */
 	private Errors readDownloadFile(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-			StudyEventDefinitionBean studyEventDefinitionBean) throws Exception {
+									StudyEventDefinitionBean studyEventDefinitionBean) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		InputSource is = new InputSource();
@@ -659,37 +616,39 @@ public class PformSubmissionService {
 						}
 
 						if (!errors.hasErrors()) {
+							// Create Item Data Bean by inserting one row at
+							// a time to Item Data table
 							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-								// Create Item Data Bean
-								// by
-								// inserting one
-								// row at
-								// a time to Item Data
-								// table
-								iddao.create(itemDataBean1);
-
-								// Update Event Crf Bean
-								// and
-								// change the
-								// status
-								// to Completed
-
+								iddao.setFormatDates(false);
+								ItemDataBean existingValue = iddao.findByItemIdAndEventCRFIdAndOrdinal(itemDataBean1.getItemId(),
+										itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
+								iddao.setFormatDates(true);
+								if (!existingValue.isActive()) {
+									iddao.create(itemDataBean1);
+								} else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
+									// Value unchanged. Do nothing.
+								} else {
+									itemDataBean1.setId(existingValue.getId());
+									iddao.updateValue(itemDataBean1);
+								}
 							}
+							// Update Event Crf Bean and change the status to Completed
 							eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
 							// Study Event status
 							// update
-							int count ;
-							if(studyBean.getParentStudyId()!=0){   	// this is a site
+							int count;
+							if (studyBean.getParentStudyId() != 0) { // this is a site
 								StudyBean parentStudyBean = getParentStudy(studyBean.getOid());
-								count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(),parentStudyBean.getId());
-							}else{   // a parent study
-								count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(),studyBean.getId());
+								count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(), parentStudyBean.getId());
+							} else { // a parent study
+								count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(), studyBean.getId());
 
 							}
-							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==count){
+							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == count) {
 
-								//							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-								//									.getId(),studyBean.getId())) {
+								// if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==
+								// getCountCrfsInAEventDefCrf(studyEventDefinitionBean
+								// .getId(),studyBean.getId())) {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
 							} else {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
@@ -720,7 +679,7 @@ public class PformSubmissionService {
 	 * @throws Exception
 	 */
 	private Errors readDownloadFileNew(String body, Errors errors, StudyBean studyBean, StudyEventBean studyEventBean, StudySubjectBean studySubjectBean,
-			StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion) throws Exception {
+									   StudyEventDefinitionBean studyEventDefinitionBean, CRFVersionBean crfVersion) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		InputSource is = new InputSource();
@@ -788,10 +747,6 @@ public class PformSubmissionService {
 
 											idao = new ItemDAO(ds);
 
-											// ArrayList<ItemBean> itemBeanList = (ArrayList<ItemBean>)
-											// idao.findByOid(itemOID);
-											// ItemBean itemBean = itemBeanList.get(0);
-
 											ItemDataBean itemDataBean = createItemData(iBean, itemValue, itemOrdinal, eventCrfBean, studyBean, studySubjectBean);
 											errors = validateItemData(itemDataBean, iBean, responseTypeId);
 											if (errors.hasErrors()) {
@@ -806,37 +761,40 @@ public class PformSubmissionService {
 						}
 
 						if (!errors.hasErrors()) {
+							// Create Item Data Bean by inserting one row at
+							// a time to Item Data table
 							for (ItemDataBean itemDataBean1 : itemDataBeanList) {
-								// Create Item Data Bean
-								// by
-								// inserting one
-								// row at
-								// a time to Item Data
-								// table
-								iddao.create(itemDataBean1);
-
-								// Update Event Crf Bean
-								// and
-								// change the
-								// status
-								// to Completed
+								iddao.setFormatDates(false);
+								ItemDataBean existingValue = iddao.findByItemIdAndEventCRFIdAndOrdinal(itemDataBean1.getItemId(),
+										itemDataBean1.getEventCRFId(), itemDataBean1.getOrdinal());
+								iddao.setFormatDates(true);
+								if (!existingValue.isActive()) {
+									iddao.create(itemDataBean1);
+								} else if (existingValue.getValue().equals(itemDataBean1.getValue())) {
+									// Value unchanged. Do nothing.
+								} else {
+									itemDataBean1.setId(existingValue.getId());
+									iddao.updateValue(itemDataBean1);
+								}
 
 							}
+							// Update Event Crf Bean and change the status to Completed
 							eventCrfBean = updateEventCRF(eventCrfBean, studyBean, studySubjectBean);
 							// Study Event status
 							// update
-							int count ;
-							if(studyBean.getParentStudyId()!=0){   	// this is a site
+							int count;
+							if (studyBean.getParentStudyId() != 0) { // this is a site
 								StudyBean parentStudyBean = getParentStudy(studyBean.getOid());
-								count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(),parentStudyBean.getId());
-							}else{   // a parent study
-								count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(),studyBean.getId());
+								count = getCountCrfsInAEventDefCrfForSite(studyEventDefinitionBean.getId(), parentStudyBean.getId());
+							} else { // a parent study
+								count = getCountCrfsInAEventDefCrf(studyEventDefinitionBean.getId(), studyBean.getId());
 
 							}
-							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==count){
+							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == count) {
 
-								//							if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) == getCountCrfsInAEventDefCrf(studyEventDefinitionBean
-								//									.getId(),studyBean.getId())) {
+								// if (getCountCompletedEventCrfsInAStudyEvent(studyEventBean) ==
+								// getCountCrfsInAEventDefCrf(studyEventDefinitionBean
+								// .getId(),studyBean.getId())) {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.COMPLETED, studyBean, studySubjectBean);
 							} else {
 								updateStudyEvent(studyEventBean, SubjectEventStatus.DATA_ENTRY_STARTED, studyBean, studySubjectBean);
@@ -903,28 +861,27 @@ public class PformSubmissionService {
 				crfVersionBean.getId());
 		DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = null;
 		for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
-			DynamicsItemGroupMetadataBean dynGrpBean=getDynamicsItemGroupMetadataDao().findByMetadataBean(itemGroupMetadataBean, eventCrfBean);
-			if (dynGrpBean == null){
+			DynamicsItemGroupMetadataBean dynGrpBean = getDynamicsItemGroupMetadataDao().findByMetadataBean(itemGroupMetadataBean, eventCrfBean);
+			if (dynGrpBean == null) {
 				dynamicsItemGroupMetadataBean = createDynamicsItemGroupMetadataBean(itemGroupBean, eventCrfBean, itemGroupMetadataBean);
 				saveDynamicGroupMeta(dynamicsItemGroupMetadataBean);
 			}
 		}
 	}
 
-	private void getItemFormMetaDataList(ItemDataBean itemDataBean, ItemBean itemBean, EventCRFBean eventCrfBean,
-			CRFVersionBean crfVersionBean) {
+	private void getItemFormMetaDataList(ItemDataBean itemDataBean, ItemBean itemBean, EventCRFBean eventCrfBean, CRFVersionBean crfVersionBean) {
 		DynamicsItemFormMetadataBean dynamicsItemFormMetadataBean = null;
 		ItemFormMetadataBean itemFormMetadataBean = getItemFromMetadata(itemBean.getId(), crfVersionBean.getId());
 
-		DynamicsItemFormMetadataBean dynBean=getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
-		if(dynBean == null ){
+		DynamicsItemFormMetadataBean dynBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
+		if (dynBean == null) {
 			dynamicsItemFormMetadataBean = createDynamicsItemFormMetadataBean(itemDataBean, itemBean, eventCrfBean, crfVersionBean);
 			saveDynamicItemFormMeta(dynamicsItemFormMetadataBean);
 		}
 	}
 
 	private DynamicsItemFormMetadataBean createDynamicsItemFormMetadataBean(ItemDataBean itemDataBean, ItemBean itemBean, EventCRFBean eventCrfBean,
-			CRFVersionBean crfVersionBean) {
+																			CRFVersionBean crfVersionBean) {
 
 		ItemFormMetadataBean itemFormMetadataBean = getItemFromMetadata(itemBean.getId(), crfVersionBean.getId());
 
@@ -942,7 +899,7 @@ public class PformSubmissionService {
 	}
 
 	private DynamicsItemGroupMetadataBean createDynamicsItemGroupMetadataBean(ItemGroupBean itemGroupBean, EventCRFBean eventCrfBean,
-			ItemGroupMetadataBean itemGroupMetadataBean) {
+																			  ItemGroupMetadataBean itemGroupMetadataBean) {
 
 		DynamicsItemGroupMetadataBean dynamicsItemGroupMetadataBean = new DynamicsItemGroupMetadataBean();
 		dynamicsItemGroupMetadataBean.setEventCrfId(eventCrfBean.getId());
@@ -1014,5 +971,47 @@ public class PformSubmissionService {
 		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
 		return studyBean;
 	}
+
+	/**
+	 * Create User Account , insert in User Account table , also insert records in Authorities table
+	 *
+	 * @param userAccountBean
+	 * @param studyBean
+	 * @param studySubjectBean
+	 * @return
+	 * @throws Exception
+	 */
+	private UserAccountBean createUserAccount(UserAccountBean userAccountBean, StudyBean studyBean, StudySubjectBean
+      studySubjectBean) throws Exception { UserAccountBean rootUserAccount = getUserAccount("root"); UserAccountBean
+      createdUserAccountBean = new UserAccountBean(); createdUserAccountBean.setName(getInputUsername(studyBean,
+      studySubjectBean)); createdUserAccountBean.setFirstName(INPUT_FIRST_NAME);
+      createdUserAccountBean.setLastName(INPUT_LAST_NAME); createdUserAccountBean.setEmail(INPUT_EMAIL);
+      createdUserAccountBean.setInstitutionalAffiliation(INPUT_INSTITUTION);
+      createdUserAccountBean.setActiveStudyId(studyBean.getId()); String passwordHash = UserAccountBean.LDAP_PASSWORD;
+      createdUserAccountBean.setPasswd(passwordHash); createdUserAccountBean.setPasswdTimestamp(null);
+      createdUserAccountBean.setLastVisitDate(null); createdUserAccountBean.setActiveStudyId(studyBean.getId());
+      createdUserAccountBean.setStatus(Status.DELETED); createdUserAccountBean.setPasswdChallengeQuestion("");
+      createdUserAccountBean.setPasswdChallengeAnswer(""); createdUserAccountBean.setPhone("");
+      createdUserAccountBean.setOwner(rootUserAccount); createdUserAccountBean.setRunWebservices(false); Role r =
+      Role.RESEARCHASSISTANT2; createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyBean.getId(),
+      r, rootUserAccount); UserType type = UserType.get(2); createdUserAccountBean.addUserType(type);
+
+      createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean); //
+      authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName())); return userAccountBean; }
+
+	/**
+	 * Create StudyUserRole records
+	 *
+	 * @param createdUserAccountBean
+	 * @param studyId
+	 * @param r
+	 * @param rootUserAccount
+	 * @return
+	 */
+    private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r,
+      UserAccountBean rootUserAccount) { StudyUserRoleBean studyUserRole = new StudyUserRoleBean();
+      studyUserRole.setStudyId(studyId); studyUserRole.setRoleName(r.getName());
+      studyUserRole.setStatus(Status.AUTO_DELETED); studyUserRole.setOwner(rootUserAccount);
+      createdUserAccountBean.addRole(studyUserRole); return createdUserAccountBean; }
 
 }

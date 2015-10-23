@@ -82,22 +82,143 @@ public class OdmController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+	/**
+	 * @api {get} /pages/odmk/studies/:studyOid/metadata Retrieve metadata
+	 * @apiName getStudyMetadata
+	 * @apiPermission admin
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiGroup Study
+	 * @apiDescription Retrieve the metadata of the specified study
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": "S_BL101",
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    The whole Study Metadata
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
-	public ModelAndView getStudyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response) throws Exception {
+	public ModelAndView getStudyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response)
+			throws Exception {
 		if (!mayProceed(studyOid))
 			return null;
 		return ruleController.studyMetadata(model, session, studyOid, response);
 	}
 
 	/**
-	 * This URL needs to change ... Right now security disabled on this ... You can call this with http://localhost:8080/OpenClinica-web-MAINLINE-SNAPSHOT /pages/odmk/studies/S_DEFAULTS1/events
+	 * This URL needs to change ... Right now security disabled on this ... You can call this with
+	 * http://localhost:8080/OpenClinica-web-MAINLINE-SNAPSHOT /pages/odmk/studies/S_DEFAULTS1/events
 	 *
 	 * @param studyOid
 	 * @return
 	 * @throws Exception
 	 */
+	/**
+	 * @api {get} /pages/odmk/study/:studyOid/studysubject/:studySubjectOid/events Retrieve an event - participant
+	 * @apiName getEvent
+	 * @apiPermission Module participate - enabled
+	 * @apiVersion 1.0.0
+	 * @apiParam {String} studyOid Study Oid.
+	 * @apiParam {String} studySubjectOid Study Subject Oid
+	 * @apiGroup Study Event
+	 * @apiDescription Retrieve an event with earliest start date and ordinal.
+	 * @apiParamExample {json} Request-Example:
+	 *                  {
+	 *                  "studyOid": "S_BL101",
+	 *                  "studySubjectOid": "SS_DYN101"
+	 *                  }
+	 * @apiSuccessExample {json} Success-Response:
+	 *                    HTTP/1.1 200 OK
+	 *                    {
+	 *                    "id": null,
+	 *                    "signature": [],
+	 *                    "clinicalData": [{
+	 *                    "annotations": [],
+	 *                    "subjectData": [{
+	 *                    "annotation": [],
+	 *                    "signature": null,
+	 *                    "status": "available",
+	 *                    "dateOfBirth": null,
+	 *                    "uniqueIdentifier": null,
+	 *                    "studyEventData": [{
+	 *                    "annotation": [],
+	 *                    "signature": null,
+	 *                    "status": null,
+	 *                    "eventName": "Scoring Visit",
+	 *                    "studyEventRepeatKey": null,
+	 *                    "endDate": null,
+	 *                    "formData": [{
+	 *                    "annotation": [],
+	 *                    "signature": null,
+	 *                    "status": "Not Started",
+	 *                    "interviewerName": null,
+	 *                    "formOID": "F_SCORING2_CRF_V10",
+	 *                    "itemGroupData": [],
+	 *                    "url":
+	 *                    "http://localhost:8006/::YYYF?iframe=true&ecid=a480dc4479409f6fe99a03d472f5cf77f4f12fb2b5ac471b9d35d737d934b042"
+	 *                    ,
+	 *                    "version": null,
+	 *                    "transactionType": null,
+	 *                    "auditRecord": null,
+	 *                    "archiveLayoutRef": null,
+	 *                    "formDataElementExtension": [],
+	 *                    "formRepeatKey": null,
+	 *                    "interviewDate": null,
+	 *                    "formName": "Scoring2_CRF",
+	 *                    "versionDescription": "Scoring2",
+	 *                    "statusChangeTimeStamp": null
+	 *                    }],
+	 *                    "studyEventOID": null,
+	 *                    "transactionType": null,
+	 *                    "auditRecord": null,
+	 *                    "studyEventDataElementExtension": [],
+	 *                    "studyEventLocation": null,
+	 *                    "startDate": "2015-08-27 12:00:00.0",
+	 *                    "subjectAgeAtEvent": null
+	 *                    }],
+	 *                    "studySubjectID": "DYN101",
+	 *                    "transactionType": null,
+	 *                    "yearOfBirth": null,
+	 *                    "auditRecord": null,
+	 *                    "investigatorRef": null,
+	 *                    "siteRef": null,
+	 *                    "subjectDataElementExtension": [],
+	 *                    "subjectKey": "SS_DYN101",
+	 *                    "secondaryID": null,
+	 *                    "sex": null
+	 *                    }],
+	 *                    "studyName": "Baseline Study 101",
+	 *                    "studyOID": "S_BL101",
+	 *                    "metaDataVersionOID": null,
+	 *                    "auditRecords": [],
+	 *                    "signatures": []
+	 *                    }],
+	 *                    "fileType": null,
+	 *                    "fileOID": null,
+	 *                    "description": null,
+	 *                    "study": [],
+	 *                    "association": [],
+	 *                    "odmversion": null,
+	 *                    "creationDateTime": null,
+	 *                    "adminData": [],
+	 *                    "referenceData": [],
+	 *                    "granularity": null,
+	 *                    "archival": null,
+	 *                    "priorFileOID": null,
+	 *                    "asOfDateTime": null,
+	 *                    "originator": null,
+	 *                    "sourceSystem": null,
+	 *                    "sourceSystemVersion": null
+	 *                    }
+	 */
+
 	@RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectOid}/events", method = RequestMethod.GET)
-	public @ResponseBody ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid) throws Exception {
+	public @ResponseBody
+	ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
 		return getODM(studyOid, studySubjectOid);
@@ -139,12 +260,16 @@ public class OdmController {
 						int eventStatus = eventCrf.getStatus().getId();
 						if (eventStatus != 1 && eventStatus != 2)
 							validStatus = false;
-						if (eventStatus == 1 && itemDataDAO.findAllByEventCRFId(eventCrf.getId()).size() > 0)
+						if (itemDataDAO.findAllByEventCRFId(eventCrf.getId()).size() > 0)
 							itemDataExists = true;
 					}
 				}
-				if (!itemDataExists && validStatus) {
-					String formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
+				if (validStatus) {
+					String formUrl = null;
+					if (!itemDataExists)
+						formUrl = createEnketoUrl(studyOID, crfVersion, nextEvent, ssoid);
+					else
+						formUrl = createEditUrl(studyOID, crfVersion, nextEvent, ssoid);
 					formDatas.add(getFormDataPerCrf(crfVersion, nextEvent, eventCrfs, crfDAO, formUrl));
 				}
 			}
@@ -175,26 +300,27 @@ public class OdmController {
 		eventDefCrfs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllActiveByEventDefinitionIdandStudyId(nextEvent.getStudyEventDefinitionId(), studyId);
 
 		StudyBean parentStudy = getParentStudy(studyBean.getOid());
-			pStudyId = parentStudy.getId();
-       	
-		edcdao = new EventDefinitionCRFDAO(dataSource);
-		parentEventDefCrfs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllActiveByEventDefinitionIdandStudyId(nextEvent.getStudyEventDefinitionId(), pStudyId);
+		pStudyId = parentStudy.getId();
 
-			boolean found;
-			for (EventDefinitionCRFBean parentEventDefinitionCrf : parentEventDefCrfs) {
-				found = false;
-				for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
-					if (parentEventDefinitionCrf.getId() == eventDefinitionCrf.getParentId()) { //
-						found = true;
-						netEventDefinitionCrfs.add(eventDefinitionCrf);
-						break;
-					}
-				}
-				if (!found) {
-					netEventDefinitionCrfs.add(parentEventDefinitionCrf);
+		edcdao = new EventDefinitionCRFDAO(dataSource);
+		parentEventDefCrfs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllActiveByEventDefinitionIdandStudyId(nextEvent.getStudyEventDefinitionId(),
+				pStudyId);
+
+		boolean found;
+		for (EventDefinitionCRFBean parentEventDefinitionCrf : parentEventDefCrfs) {
+			found = false;
+			for (EventDefinitionCRFBean eventDefinitionCrf : eventDefCrfs) {
+				if (parentEventDefinitionCrf.getId() == eventDefinitionCrf.getParentId()) { //
+					found = true;
+					netEventDefinitionCrfs.add(eventDefinitionCrf);
+					break;
 				}
 			}
-	//		netEventDefinitionCrfs = eventDefCrfs;
+			if (!found) {
+				netEventDefinitionCrfs.add(parentEventDefinitionCrf);
+			}
+		}
+		// netEventDefinitionCrfs = eventDefCrfs;
 
 		sortList(netEventDefinitionCrfs);
 
@@ -231,7 +357,8 @@ public class OdmController {
 	private String createEnketoUrl(String studyOID, CRFVersionBean crfVersion, StudyEventBean nextEvent, String ssoid) throws Exception {
 		PFormCache cache = PFormCache.getInstance(context);
 		String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
-		String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
+		String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
+				String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
 
 		String url = enketoURL + "&" + FORM_CONTEXT + "=" + contextHash;
 		logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
@@ -239,7 +366,20 @@ public class OdmController {
 
 	}
 
-	private ODMcomplexTypeDefinitionFormData getFormDataPerCrf(CRFVersionBean crfVersion, StudyEventBean nextEvent, List<EventCRFBean> eventCrfs, CRFDAO crfDAO, String formUrl) {
+	private String createEditUrl(String studyOID, CRFVersionBean crfVersion, StudyEventBean nextEvent, String ssoid) throws Exception {
+		PFormCache cache = PFormCache.getInstance(context);
+		String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
+				String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
+		String editURL = CoreResources.getField("sysURL.base") + "pages/api/v1/editform/" + studyOID + "/url";
+
+		String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;
+		logger.debug("Edit URL for " + crfVersion.getName() + "= " + url);
+		return url;
+
+	}
+
+	private ODMcomplexTypeDefinitionFormData getFormDataPerCrf(CRFVersionBean crfVersion, StudyEventBean nextEvent, List<EventCRFBean> eventCrfs,
+															   CRFDAO crfDAO, String formUrl) {
 		EventCRFBean selectedEventCRFBean = null;
 		CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(crfVersion.getId());
 		for (EventCRFBean eventCRFBean : eventCrfs) {
@@ -275,7 +415,8 @@ public class OdmController {
 		return studyEventData;
 	}
 
-	private ODMcomplexTypeDefinitionFormData generateFormData(CRFVersionBean crfVersionBean, StudyEventBean nextEvent, EventCRFBean eventCRFBean, CRFBean crfBean, String formUrl) {
+	private ODMcomplexTypeDefinitionFormData generateFormData(CRFVersionBean crfVersionBean, StudyEventBean nextEvent, EventCRFBean eventCRFBean,
+															  CRFBean crfBean, String formUrl) {
 		ODMcomplexTypeDefinitionFormData formData = new ODMcomplexTypeDefinitionFormData();
 		formData.setFormOID(crfVersionBean.getOid());
 		formData.setFormName(crfBean.getName());
@@ -296,7 +437,7 @@ public class OdmController {
 
 	/**
 	 * Currently not used, but keep here for future unit test
-	 * 
+	 *
 	 * @param clazz
 	 * @param odm
 	 * @return
@@ -361,6 +502,7 @@ public class OdmController {
 		StudyBean study = getParentStudy(studyOid);
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+
 		participantPortalRegistrar = new ParticipantPortalRegistrar();
 		String pManageStatus = "ACTIVE"; //participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE , PENDING , INACTIVE
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
@@ -372,5 +514,4 @@ public class OdmController {
 		}
 		return accessPermission;
 	}
-
 }
