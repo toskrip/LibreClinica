@@ -26,7 +26,8 @@ public class ParticipantPortalRegistrar {
 
     public Authorization getAuthorization(String studyOid) {
 
-//        Study study = new Study();
+        Study study = new Study();
+        study.setHost(studyOid); // Study identifier used as host in url enketo URL (I am registering each study in enketo with OID)
 //        //study.setInstanceUrl();
 //       // study.setOrganization();
 //        study.setStudyOid(studyOid);
@@ -34,13 +35,12 @@ public class ParticipantPortalRegistrar {
 //        AuthorizationStatus authStatus = new AuthorizationStatus();
 //        authStatus.setStatus("enabled"); // enabled or disabled
 //
-//        Authorization auth = new Authorization();
-//        auth.setStudy(study);
+        Authorization auth = new Authorization();
+        auth.setStudy(study);
+
 //        auth.setPformApiKey("enketorules"); // API key "ocrocks" is for PManager
 //        auth.setPformUrl("http://g40rpbtrials2.med.tu-dresden.de:9005");
 //        auth.setAuthorizationStatus(authStatus);
-//
-//        return auth;
 
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
@@ -49,9 +49,10 @@ public class ParticipantPortalRegistrar {
         RestTemplate rest = new RestTemplate(requestFactory);
 
         try {
-            Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
-            if (response.length > 0 && response[0].getAuthorizationStatus() != null)
-                return response[0];
+            //Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
+            //if (response.length > 0 && response[0].getAuthorizationStatus() != null)
+            //    return response[0];
+            return auth;
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -190,29 +191,31 @@ public class ParticipantPortalRegistrar {
     }
 
     public String getStudyHost(String studyOid) throws Exception {
-
-        String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        String pManageUrl = CoreResources.getField("portalURL");
-        String pManageUrlFull = pManageUrl + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
-
-        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
-        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
-        RestTemplate rest = new RestTemplate(requestFactory);
-        try {
-            Authorization[] response = rest.getForObject(pManageUrlFull, Authorization[].class);
-            if (response.length > 0 && response[0].getStudy() != null && response[0].getStudy().getHost() != null
-                    && !response[0].getStudy().getHost().equals("")) {
-                URL url = new URL(pManageUrl);
-                String port = "";
-                if (url.getPort() > 0)
-                    port = ":" + String.valueOf(url.getPort());
-                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/#/login";
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-        }
+        // I don't have any participate manager
         return "";
+
+//        String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+//        String pManageUrl = CoreResources.getField("portalURL");
+//        String pManageUrlFull = pManageUrl + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
+//
+//        CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+//        requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
+//        RestTemplate rest = new RestTemplate(requestFactory);
+//        try {
+//            Authorization[] response = rest.getForObject(pManageUrlFull, Authorization[].class);
+//            if (response.length > 0 && response[0].getStudy() != null && response[0].getStudy().getHost() != null
+//                    && !response[0].getStudy().getHost().equals("")) {
+//                URL url = new URL(pManageUrl);
+//                String port = "";
+//                if (url.getPort() > 0)
+//                    port = ":" + String.valueOf(url.getPort());
+//                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/#/login";
+//            }
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//            logger.error(ExceptionUtils.getStackTrace(e));
+//        }
+//        return "";
     }
 
 }

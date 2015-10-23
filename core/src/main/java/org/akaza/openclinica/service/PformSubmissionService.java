@@ -152,25 +152,24 @@ public class PformSubmissionService {
 	 * @return
 	 * @throws Exception
 	 */
-    /*
-     * private UserAccountBean createUserAccount(UserAccountBean userAccountBean, StudyBean studyBean, StudySubjectBean
-     * studySubjectBean) throws Exception { UserAccountBean rootUserAccount = getUserAccount("root"); UserAccountBean
-     * createdUserAccountBean = new UserAccountBean(); createdUserAccountBean.setName(getInputUsername(studyBean,
-     * studySubjectBean)); createdUserAccountBean.setFirstName(INPUT_FIRST_NAME);
-     * createdUserAccountBean.setLastName(INPUT_LAST_NAME); createdUserAccountBean.setEmail(INPUT_EMAIL);
-     * createdUserAccountBean.setInstitutionalAffiliation(INPUT_INSTITUTION);
-     * createdUserAccountBean.setActiveStudyId(studyBean.getId()); String passwordHash = UserAccountBean.LDAP_PASSWORD;
-     * createdUserAccountBean.setPasswd(passwordHash); createdUserAccountBean.setPasswdTimestamp(null);
-     * createdUserAccountBean.setLastVisitDate(null); createdUserAccountBean.setActiveStudyId(studyBean.getId());
-     * createdUserAccountBean.setStatus(Status.DELETED); createdUserAccountBean.setPasswdChallengeQuestion("");
-     * createdUserAccountBean.setPasswdChallengeAnswer(""); createdUserAccountBean.setPhone("");
-     * createdUserAccountBean.setOwner(rootUserAccount); createdUserAccountBean.setRunWebservices(false); Role r =
-     * Role.RESEARCHASSISTANT2; createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyBean.getId(),
-     * r, rootUserAccount); UserType type = UserType.get(2); createdUserAccountBean.addUserType(type);
-     *
-     * createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean); //
-     * authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName())); return userAccountBean; }
-     */
+     private UserAccountBean createUserAccount(UserAccountBean userAccountBean, StudyBean studyBean, StudySubjectBean
+      studySubjectBean) throws Exception { UserAccountBean rootUserAccount = getUserAccount("root"); UserAccountBean
+      createdUserAccountBean = new UserAccountBean(); createdUserAccountBean.setName(getInputUsername(studyBean,
+      studySubjectBean)); createdUserAccountBean.setFirstName(INPUT_FIRST_NAME);
+      createdUserAccountBean.setLastName(INPUT_LAST_NAME); createdUserAccountBean.setEmail(INPUT_EMAIL);
+      createdUserAccountBean.setInstitutionalAffiliation(INPUT_INSTITUTION);
+      createdUserAccountBean.setActiveStudyId(studyBean.getId()); String passwordHash = UserAccountBean.LDAP_PASSWORD;
+      createdUserAccountBean.setPasswd(passwordHash); createdUserAccountBean.setPasswdTimestamp(null);
+      createdUserAccountBean.setLastVisitDate(null); createdUserAccountBean.setActiveStudyId(studyBean.getId());
+      createdUserAccountBean.setStatus(Status.DELETED); createdUserAccountBean.setPasswdChallengeQuestion("");
+      createdUserAccountBean.setPasswdChallengeAnswer(""); createdUserAccountBean.setPhone("");
+      createdUserAccountBean.setOwner(rootUserAccount); createdUserAccountBean.setRunWebservices(false); Role r =
+      Role.RESEARCHASSISTANT2; createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, studyBean.getId(),
+      r, rootUserAccount); UserType type = UserType.get(2); createdUserAccountBean.addUserType(type);
+
+      createdUserAccountBean = (UserAccountBean) udao.create(createdUserAccountBean); //
+      authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName())); return userAccountBean; }
+
 	/**
 	 * Create StudyUserRole records
 	 *
@@ -180,13 +179,12 @@ public class PformSubmissionService {
 	 * @param rootUserAccount
 	 * @return
 	 */
-    /*
-     * private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r,
-     * UserAccountBean rootUserAccount) { StudyUserRoleBean studyUserRole = new StudyUserRoleBean();
-     * studyUserRole.setStudyId(studyId); studyUserRole.setRoleName(r.getName());
-     * studyUserRole.setStatus(Status.AUTO_DELETED); studyUserRole.setOwner(rootUserAccount);
-     * createdUserAccountBean.addRole(studyUserRole); return createdUserAccountBean; }
-     */
+      private UserAccountBean addActiveStudyRole(UserAccountBean createdUserAccountBean, int studyId, Role r,
+      UserAccountBean rootUserAccount) { StudyUserRoleBean studyUserRole = new StudyUserRoleBean();
+      studyUserRole.setStudyId(studyId); studyUserRole.setRoleName(r.getName());
+      studyUserRole.setStatus(Status.AUTO_DELETED); studyUserRole.setOwner(rootUserAccount);
+      createdUserAccountBean.addRole(studyUserRole); return createdUserAccountBean; }
+
 	private int getCountCompletedEventCrfsInAStudyEvent(StudyEventBean seBean) {
 		int count = 0;
 		count = ecdao.findAllByStudyEventAndStatus(seBean, Status.UNAVAILABLE).size();
@@ -323,13 +321,14 @@ public class PformSubmissionService {
 		StudyBean studyBean = getStudy(studySubjectBean);
 		UserAccountBean userAccountBean = getUserAccount(getInputUsername(studyBean, studySubjectBean));
 		if (!userAccountBean.isActive() && studySubjectBean.isActive()) {
-			// userAccountBean = createUserAccount(userAccountBean, studyBean, studySubjectBean);
-			logger.info("***  User Account Does Not Exist in the System  ***");
-			errors.reject("  User Account Does Not Exist in the System  ");
-			return errors;
-		} else {
-			logger.info("***User Account already exist in the system***");
+			 userAccountBean = createUserAccount(userAccountBean, studyBean, studySubjectBean);
+//			logger.info("***  User Account Does Not Exist in the System  ***");
+//			errors.reject("  User Account Does Not Exist in the System  ");
+//			return errors;
 		}
+//		else {
+//			logger.info("***User Account already exist in the system***");
+//		}
 
 		// Study Event Validation check (System must include events that are
 		// scheduled or started)
