@@ -52,14 +52,14 @@
             <tr>
                 <td>
                     <img src="/OpenClinica/images/dktk-logo.jpg" alt="DKTK-logo" width="300px"/>
-                    <p>Welcome to OpenClinica clinical trial software</p>
+                    <p>Welcome to OpenClinica EDC software</p>
                 </td>
 
                 <td id="filler">&nbsp;</td>
                 <td id="welcomeTextRadPlanBio">
-                    <p>CTMS and EDC for RadPlanBio</p>
+                    <p>EDC for RadPlanBio</p>
                     <p>
-                        The RadPlanBio platform is a web-based solution for exchanging and sharing medical cancer treatment research data in order to allow multi-centric studies. The idea is to deliver a study management and electronic data capture system with special extensions dedicated to safe upload of medical DICOM files.
+                        The RadPlanBio platform is a web-based solution which supports collection and exchange of radiotherapy specific research data in large scale multi-centre clinical and pre-clinical studies. It delivers a study management and electronic data capture system with special extensions dedicated to secure upload of medical imaging and treatment plans in DICOM format.
                     </p>
                 </td>
             </tr>

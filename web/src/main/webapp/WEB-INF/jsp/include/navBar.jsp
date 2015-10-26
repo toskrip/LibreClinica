@@ -69,6 +69,13 @@
       <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
 </c:if>
 
+<%-- RadPlanBio style--%>
+<link rel="stylesheet" href="/OpenClinica/includes/radplanbio.css" type="text/css">
+<!-- RadPlanBio -->
+<div class="headerBar">
+    <div class="headerText">RadPlanBio - radiotherapy clinical research IT infrastructure</div>
+</div>
+
 <!-- Main Navigation -->
      <div class="oc_nav">
         <div id="StudyInfo">

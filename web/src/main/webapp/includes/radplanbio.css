@@ -14,14 +14,13 @@ body {
     background: #3890D9;
 }
 .headerText {
-    margin-left: 51%;
-    text-align: left;
+    margin-right: 10px;
+    text-align: right;
     color: #FFFFFF;
     font-family: Tahoma, Arial, Helvetica, sans-serif;
     font-size: 10pt;
     font-weight: bold;
 }
-
 
 #OCLogoBar {
     display: inline-block;
