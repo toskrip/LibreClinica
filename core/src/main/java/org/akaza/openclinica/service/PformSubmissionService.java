@@ -69,7 +69,7 @@ import org.xml.sax.InputSource;
  */
 /**
  * @author joekeremian
- * 
+ *
  */
 public class PformSubmissionService {
 
@@ -136,17 +136,17 @@ public class PformSubmissionService {
 		return count;
 	}
 
-	private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId, Integer studyId) {
+	private int getCountCrfsInAEventDefCrf(Integer studyEventDefinitionId , Integer studyId) {
 		int count = 0;
 		edcdao = new EventDefinitionCRFDAO(ds);
-		count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId, studyId).size();
+		count = edcdao.findAllDefIdandStudyId(studyEventDefinitionId , studyId).size();
 		return count;
 	}
 
-	private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId, Integer studyId) {
+	private int getCountCrfsInAEventDefCrfForSite(Integer studyEventDefinitionId , Integer studyId) {
 		int count = 0;
 		edcdao = new EventDefinitionCRFDAO(ds);
-		count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId, studyId).size();
+		count = edcdao.findAllDefnIdandStudyIdForSite(studyEventDefinitionId , studyId).size();
 		return count;
 	}
 
@@ -415,7 +415,6 @@ public class PformSubmissionService {
 	 */
 	private ItemDataBean createItemData(ItemBean itemBean, String itemValue, Integer itemOrdinal, EventCRFBean eventCrfBean, StudyBean studyBean,
 										StudySubjectBean studySubjectBean) {
-		logger.info("item Oid:  " + itemBean.getOid() + "   itemValue:  " + itemValue + "  itemOrdinal:  " + itemOrdinal);
 		ItemDataBean itemDataBean = new ItemDataBean();
 		itemDataBean.setItemId(itemBean.getId());
 		itemDataBean.setEventCRFId(eventCrfBean.getId());
