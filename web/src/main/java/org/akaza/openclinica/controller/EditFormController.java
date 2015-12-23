@@ -120,7 +120,7 @@ public class EditFormController {
      * @api {get} /pages/api/v1/editform/:studyOid/url Get Form Edit URL
      * @apiName getEditUrl
      * @apiPermission admin
-     * @apiVersion 1.0.0
+     * @apiVersion 3.8.0
      * @apiParam {String} studyOid Study Oid.
      * @apiParam {String} ecid Key that will be used by enketo to cache form information.
      * @apiGroup Form
@@ -238,11 +238,13 @@ public class EditFormController {
                     groupElement = doc.createElement(itemGroup.getName());
                 else
                     groupElement = doc.createElement(itemGroup.getOcOid());
+                Element repeatOrdinal = null;
                 if (isrepeating) {
-                    groupElement.setTextContent(repeatGroupMin);
+                	repeatOrdinal = doc.createElement("REPEAT_ORDINAL");
+                	repeatOrdinal.setTextContent(String.valueOf(i+1));
+                	groupElement.appendChild(repeatOrdinal);
                 }
-                crfElement.appendChild(groupElement);
-
+                boolean hasItemData = false;
                 for (Item item : items) {
                     ItemFormMetadata itemMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), i + 1);
@@ -262,8 +264,14 @@ public class EditFormController {
 
                         question.setTextContent(itemValue);
                     }
-                    groupElement.appendChild(question);
+                    if (!itemData.isDeleted()) { 
+                    	hasItemData = true; 
+                    	groupElement.appendChild(question);
+                    }
                 } // end of item
+                if (hasItemData) {
+                	crfElement.appendChild(groupElement);
+                }
             }
 
         } // end of group
@@ -277,6 +285,7 @@ public class EditFormController {
         DOMSource source = new DOMSource(doc);
         transformer.transform(source, result);
         String instance = writer.toString();
+        System.out.println("Editable instance = " + instance);
         return instance;
     }
 

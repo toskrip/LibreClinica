@@ -783,11 +783,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
                     try {
                         //&& (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
-                        if (getStudyBean().getStatus() == Status.AVAILABLE
-                                && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE")
-                                && participateStatus(studySubjectBean).equalsIgnoreCase("enabled")) {
-                            url.append(viewParticipateBuilder(studySubjectBean));
-                        }
+//                        if (getStudyBean().getStatus() == Status.AVAILABLE
+//                                && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE")
+//                                && participateStatus(studySubjectBean).equalsIgnoreCase("enabled")) {
+//                            url.append(viewParticipateBuilder(studySubjectBean));
+//                        }
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();

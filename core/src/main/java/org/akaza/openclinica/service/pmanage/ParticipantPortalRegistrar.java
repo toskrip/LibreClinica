@@ -7,8 +7,6 @@ import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.service.pmanage.Authorization;
-import org.akaza.openclinica.service.pmanage.Study;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +23,6 @@ public class ParticipantPortalRegistrar {
     public static final int PARTICIPATE_READ_TIMEOUT = 5000;
 
     public Authorization getAuthorization(String studyOid) {
-        Study study = new Study();
-        study.setHost(studyOid); // Study identifier used as host in url enketo URL (I am registering each study in enketo with OID)
-        Authorization auth = new Authorization();
-        auth.setStudy(study);
-
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
@@ -40,6 +33,11 @@ public class ParticipantPortalRegistrar {
 //            Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
 //            if (response.length > 0 && response[0].getAuthorizationStatus() != null)
 //                return response[0];
+
+            Study study = new Study();
+            study.setHost(studyOid); // Study identifier used as host in url enketo URL (I am registering each study in enketo with OID)
+            Authorization auth = new Authorization();
+            auth.setStudy(study);
             return auth;
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -51,8 +49,7 @@ public class ParticipantPortalRegistrar {
     public String getCachedRegistrationStatus(String studyOid, HttpSession session) throws Exception {
         String regStatus = (String) session.getAttribute("pManageRegistrationStatus");
         if (regStatus == null) {
-            //regStatus = getRegistrationStatus(studyOid);
-            regStatus = "ACTIVE";
+            regStatus = getRegistrationStatus(studyOid);
             session.setAttribute("pManageRegistrationStatus", regStatus);
         }
         return regStatus;
@@ -69,9 +66,10 @@ public class ParticipantPortalRegistrar {
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
         try {
-            Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
-            if (response.length > 0 && response[0].getAuthorizationStatus() != null)
-                return response[0].getAuthorizationStatus().getStatus();
+//            Authorization[] response = rest.getForObject(pManageUrl, Authorization[].class);
+//            if (response.length > 0 && response[0].getAuthorizationStatus() != null)
+//                return response[0].getAuthorizationStatus().getStatus();
+            return "ACTIVE";
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.debug(ExceptionUtils.getStackTrace(e));
@@ -125,11 +123,12 @@ public class ParticipantPortalRegistrar {
     }
 
     public String registerStudy(String studyOid) {
-        return registerStudy(studyOid, null);
+        return registerStudy(studyOid, null, null);
     }
 
-    public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO) {
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/email";
+    public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO, String hostname) {
+        String host = hostname.substring(0,hostname.indexOf("/#/login"));
+        String pManageUrl =host + "/app/rest/oc/email";
 
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
         requestFactory.setReadTimeout(PARTICIPATE_READ_TIMEOUT);
@@ -144,7 +143,7 @@ public class ParticipantPortalRegistrar {
         return "";
     }
 
-    public String registerStudy(String studyOid, String hostName) {
+    public String registerStudy(String studyOid, String hostName, String studyName) {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations?studyoid=" + studyOid + "&instanceurl=" + ocUrl;
         Authorization authRequest = new Authorization();
@@ -152,6 +151,8 @@ public class ParticipantPortalRegistrar {
         authStudy.setStudyOid(studyOid);
         authStudy.setInstanceUrl(ocUrl);
         authStudy.setHost(hostName);
+        authStudy.setStudyName(studyName);
+        authStudy.setOpenClinicaVersion(CoreResources.getField("OpenClinica.version"));
         authRequest.setStudy(authStudy);
 
         AuthorizationStatus authStatus = new AuthorizationStatus();

@@ -76,9 +76,39 @@
             document.forms[1].submit();
         }
     }
-    
+
 </script>
-    
+
+ <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+
+      <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('#requestRandomizationAccess').click(function() {
+                jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
+            });
+
+            jQuery('#cancelRandomizationAccessRequest').click(function() {
+                jQuery.unblockUI();
+                $('#randomizationWarnings').empty();
+            });
+            // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
+            var warnings = "${regMessages}";
+            if (warnings.length > 0) {
+            	jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
+            }
+        });
+
+        // Hide the popup window if the escape key is pressed
+        jQuery(document).keyup(function(keyPressed) {
+            if(keyPressed.keyCode === 27) {
+                $('#randomizationWarnings').empty();
+                jQuery.unblockUI();
+            }
+        });
+    </script>
+</c:if>
+
+
 <c:if test="${portalURL!= '' && portalURL!= null}">
     <script type="text/javascript">
         jQuery(document).ready(function() {
@@ -92,11 +122,11 @@
             });
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
-            if (warnings.length > 0) { 
-            	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } }); 
+            if (warnings.length > 0) {
+            	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } });
             }
         });
-        
+
         // Hide the popup window if the escape key is pressed
         jQuery(document).keyup(function(keyPressed) {
             if(keyPressed.keyCode === 27) {
@@ -261,13 +291,13 @@
                         <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -316,13 +346,13 @@
                         <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -371,13 +401,13 @@
                         <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -427,18 +457,18 @@
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
 						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
 						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                 
+
                     </c:otherwise>
-					
+
                 </c:choose>
-				
+
             </td>
         </tr>
         <tr>
@@ -483,13 +513,13 @@
                         <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -541,13 +571,13 @@
                         <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:when>
                     <c:otherwise>
                         <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
-                        
+
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -557,7 +587,7 @@
   <br>
   <br>
 
-  <c:if test="${portalURL!= '' && portalURL!= null}">
+
       <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
           <thead>
           <tr>
@@ -568,6 +598,9 @@
               <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
               </tr>
           </thead>
+
+            <c:if test="${portalURL!= '' && portalURL!= null}">
+
           <tbody>
               <tr>
                   <td>&nbsp;</td>
@@ -609,11 +642,57 @@
                   </td>
               </tr>
           </tbody>
+          </c:if>
+
+
+          <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+          <tbody>
+              <tr>
+                  <td>&nbsp;</td>
+                  <td><fmt:message key="randomization" bundle="${resword}"/></td>
+                  <td>
+                      <c:choose>
+                          <c:when test="${randomizationOCStatus == 'disabled'}"><span id="randomizationStatus" class="randomization-inactive-status"><fmt:message key="randomization_status_deactivated" bundle="${resword}"/></span></c:when>
+                          <c:when test="${empty randomizationStatus}"><span id="randomizationStatus"><fmt:message key="randomization_status_notfound" bundle="${resword}"/></span></c:when>
+                          <c:when test="${randomizationStatus == 'PENDING'}"><span id="randomizationStatus"><fmt:message key="randomization_status_pending" bundle="${resword}"/></span></c:when>
+                          <c:when test="${randomizationStatus == 'ACTIVE'}"><span id="randomizationStatus" class="randomization-active-status"><fmt:message key="randomization_status_active" bundle="${resword}"/></span></c:when>
+                          <c:when test="${randomizationStatus == 'INACTIVE'}"><span id="randomizationStatus" class="randomization-inactive-status"><fmt:message key="randomization_status_inactive" bundle="${resword}"/></span></c:when>
+                      </c:choose>
+                  </td>
+                  <td>
+                    <span id="randomizeURL">
+                      <c:choose>
+                          <c:when test="${!empty randomizeURL && !empty randomizationStatus && randomizationStatus == 'ACTIVE'}">
+                              <a href="<c:url value="${randomizeURL}"/>" target="_blank">${randomizeURL}</a>
+                          </c:when>
+                          <c:when test="${!empty randomizeURL}">${randomizeURL}</c:when>
+                          <c:otherwise>&nbsp;</c:otherwise>
+                      </c:choose>
+                    </span>
+                  </td>
+                  <td>
+                      <c:url var="reactivateRandomization" value="studymodule/${currentStudy.oid}/reactivaterandomization"/>
+                      <c:url var="deactivateRandomization" value="studymodule/${currentStudy.oid}/deactivaterandomization"/>
+                      <c:choose>
+                          <c:when test="${randomizationOCStatus == 'disabled' && !empty randomizationStatus}">
+                              <a href="${reactivateRandomization}" id="reactivateRandomizationAccess" name="reactivateRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                          </c:when>
+                          <c:when test="${randomizationOCStatus == 'disabled'}">
+                              <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                          </c:when>
+                          <c:otherwise>
+                              <a href="${deactivateRandomization}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                          </c:otherwise>
+                      </c:choose>
+                  </td>
+              </tr>
+          </tbody>
+          </c:if>
+
       </table>
       <br>
       <br>
-  </c:if>
-  
+
   <%-- additional table added tbh, 09/05/2009 --%>
   <c:if test="${!empty childStudyUserCount }">
   <table width="4%" style="border-left: 0px; border-top: 0px; border-bottom: 0px; border-right: 0px;" align="left" cellspacing="0" cellpadding="0">
@@ -661,7 +740,7 @@
             <c:if test="${!empty regMessages}">
                 <div id="participateWarnings" class="participate-warnings">
                     <c:forEach var="message" items="${regMessages}">
-                        <c:out value="${message}" escapeXml="false"/> 
+                        <c:out value="${message}" escapeXml="false"/>
                         <br>
                     </c:forEach>
                 </div>
@@ -671,4 +750,23 @@
         </form>
     </div>
 </c:if>
+
+    <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+    <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
+        <form action="studymodule/${currentStudy.oid}/randomize" method="post">
+            <h1>
+                <fmt:message key="randomization_reg_title" bundle="${resword}"/>
+                <a href="javascript:openDocWindow('https://docs.openclinica.com/randomization/activate-openclinica-randomize-your-study')">
+                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
+                </a>
+            </h1>
+            <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part1" bundle="${resword}"/></p>
+            <br>
+            <input type="submit" id="submitRandomizationAccessRequest" class="button_medium" value="Request Access"/>
+            <input type="button" id="cancelRandomizationAccessRequest" class="button" value="Cancel"/>
+        </form>
+    </div>
+</c:if>
+
+
 <jsp:include page="include/footer.jsp"/>

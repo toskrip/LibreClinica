@@ -10,6 +10,7 @@ import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.EventActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.RandomizeActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.hibernate.stat.Statistics;
@@ -70,6 +71,9 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
         // Forcing eager fetch of actions & their properties
         for (RuleSetRuleBean ruleSetRuleBean : ruleSetRules) {
             for (RuleActionBean action : ruleSetRuleBean.getActions()) {
+                if (action instanceof RandomizeActionBean) {
+                    ((RandomizeActionBean) action).getProperties().size();
+                }
                 if (action instanceof InsertActionBean) {
                     ((InsertActionBean) action).getProperties().size();
                 }
@@ -110,10 +114,10 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
             final int rowEnd) {
 
         String select =
-            "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name as iname,re.value as revalue,sed.name as sedname,c.name as cname,cv.name as cvname,ig.name as igname,rer.value as rervalue,r.oc_oid as rocoid,r.description as rdescription,r.name as rname from rule_set_rule rsr ";
+            "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name as iname,re.value as revalue,sed.name as sedname,c.name as cname,cv.name as cvname,ig.name as igname,rer.value as rervalue,r.oc_oid as rocoid,r.description as rdescription,r.name as rname ,rs.run_schedule,rs.run_time from rule_set_rule rsr ";
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             select =
-                "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name iname,re.value revalue,sed.name sedname,c.name cname,cv.name cvname,ig.name igname,rer.value rervalue,r.oc_oid rocoid,r.description rdescription,r.name rname from rule_set_rule rsr ";
+                "select DISTINCT(rsr.id),rsr.rule_set_id,rsr.rule_id,rsr.owner_id,rsr.date_created, rsr.date_updated, rsr.update_id, rsr.status_id,rsr.version,i.name iname,re.value revalue,sed.name sedname,c.name cname,cv.name cvname,ig.name igname,rer.value rervalue,r.oc_oid rocoid,r.description rdescription,r.name rname,rs.run_schedule,rs.run_time from rule_set_rule rsr ";
         }
 
         String query =
