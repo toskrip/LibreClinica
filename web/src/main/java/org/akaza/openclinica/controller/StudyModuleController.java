@@ -417,9 +417,9 @@ public class StudyModuleController {
 
 
         // Load Randomization  information
-        String configServerUrl = CoreResources.getField("configServerUrl");
-        map.addAttribute("configServerUrl", configServerUrl);
-        if (configServerUrl != null && !configServerUrl.equals("")) {
+        String moduleManager = CoreResources.getField("moduleManager");
+        map.addAttribute("moduleManager", moduleManager);
+        if (moduleManager != null && !moduleManager.equals("")) {
 
             String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
@@ -435,12 +435,14 @@ public class StudyModuleController {
                 URL randomizeUrl=null;
                 if (randomization != null && randomization.getStatus() != null){
                     randomizationStatus = randomization.getStatus();
+                    if (randomization.getUrl()!=null){
                     try {
                         randomizeUrl= new URL (randomization.getUrl());
                     } catch (MalformedURLException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+                   } 
                 }
                 map.addAttribute("randomizeURL", randomizeUrl);
               map.addAttribute("randomizationOCStatus", randomizationOCStatus);

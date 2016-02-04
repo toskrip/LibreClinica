@@ -257,10 +257,12 @@ public class ExpressionService {
     }
     
         
- public String getValueFromDbb(String expression) throws OpenClinicaSystemException {
+ public HashMap <String,String> getValueFromDbb(String expression) throws OpenClinicaSystemException {
+     HashMap<String , String > map = new HashMap<>();
         if (isExpressionPartial(expression)) {
             throw new OpenClinicaSystemException("getValueFromDb:We cannot get the Value of a PARTIAL expression : " + expression);
         }
+        
         try {
             // Get the studyEventId from RuleSet Target so we can know which
             // StudySubject we are dealing with.
@@ -281,6 +283,9 @@ public class ExpressionService {
             StudyEventBean studyEventofThisExpression =
                 getStudyEventDao().findAllByStudyEventDefinitionAndCrfOidsAndOrdinal(studyEventDefinitionOid, crfOrCrfVersionOid, studyEventDefinitionOrdinal,
                         studySubjectId);
+  
+            if(studyEvent.getId()==studyEventofThisExpression.getId())
+                map.put("match", "true"); 
 
             logger.debug("studyEvent : {} , itemOid {} , itemGroupOid {}", new Object[] { studyEventofThisExpression.getId(),
                 getItemOidFromExpression(expression), getItemGroupOidFromExpression(expression) });
@@ -298,10 +303,12 @@ public class ExpressionService {
             ItemBean itemBean = (ItemBean) getItemDao().findByPK(itemDataBean.getItemId());
             String value = itemData.get(index).getValue();
             value = ifValueIsDate(itemBean, value);
-
-            return value;
+            map.put("value", value); 
+           
+                 
+            return map;
         } catch (Exception e) {
-            return null;
+            return map;
         }
     }
 
@@ -332,7 +339,8 @@ public class ExpressionService {
         }
         return result;
     }
-
+    
+    
     public String getValueFromForm(String expression, Map<String, ItemBean> itemBeans) {
         if (itemBeans == null)
             logger.debug("The Map that stores ItemBeans is null. Item Date value cannot be processed.");
@@ -388,31 +396,74 @@ public class ExpressionService {
         	}
         	
         	
-        	String fullExpression="";
             if (isExpressionPartial(expression)) {
-                 fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
-                 value = getValueFromDbOrForm(fullExpression,itemBeansI);
+                String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
+                List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
+               
+                fullExpression =
+                    fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(), itemDatas, expressionWrapper.getEventCrf());
+                if (checkSyntax(fullExpression)) {
+                    String valueFromForm = null;
+                    if (items == null) {
+                        valueFromForm = getValueFromForm(fullExpression);
+                    } else {
+                        valueFromForm = getValueFromForm(fullExpression, items);
+                    }
+                    String valueFromDb = null;
+                    if (itemBeansI == null) {
+                        valueFromDb = getValueFromDb(fullExpression, itemDatas);
+                    } else {
+                        valueFromDb = getValueFromDb(fullExpression, itemDatas, itemBeansI);
+                    }
+                    logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
+                    if (valueFromForm == null && valueFromDb == null) {
+                        throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
+                            expressionWrapper.getRuleSet().getTarget().getValue() });
+                    }
+                    /*
+                     * if (valueFromForm != null) { // TODO: Do this if type a
+                     * date String dateFormat =
+                     * ResourceBundleProvider.getFormatBundle
+                     * ().getString("date_format_string"); String dateRegexp =
+                     * ResourceBundleProvider
+                     * .getFormatBundle().getString("date_regexp");
+                     * valueFromForm =
+                     * ExpressionTreeHelper.isValidDate(valueFromForm,
+                     * dateFormat, dateRegexp); }
+                     */
+                    value = valueFromForm == null ? valueFromDb : valueFromForm;
+                }
+             } else {
+                 // So Expression is not Partial
+                 HashMap<String, String> map = getValueFromDbb(expression);
+                  String valueFromDb=null;
+                  String matchEvents=null;
+                  String valueFromForm=null;
+                  if (checkSyntax(expression)) {
+                     valueFromDb = map.get("value");
+                     matchEvents = map.get("match");
 
-            } else {
-                
-                String ruleSetExpression = expressionWrapper.getRuleSet().getTarget().getValue();
-                String ruleSetExpressionStudyEventId = getStudyEventDefinitionOidOrdinalFromExpression(ruleSetExpression);
-                StudyEventBean studyEvent = (StudyEventBean) getStudyEventDao().findByPK(Integer.valueOf(ruleSetExpressionStudyEventId));
-
-                int index = expression.indexOf(".",1);
-                String eventOidPart = expression.substring(0, index);
-                int subIndex = eventOidPart.indexOf("[");
-                if (subIndex!=-1)
-                    eventOidPart=expression.substring(0, subIndex);   // Get rid of brackets
-                
-                fullExpression = eventOidPart +"["+studyEvent.getId()+"]" + expression.substring(index);
-               value = getValueFromDbOrForm(fullExpression,itemBeansI);
-           }
+                // if se_id are a match go in , otherwise nothing     
+                     if (matchEvents!=null && matchEvents.equals("true")){                     
+                     if (items == null) {
+                         valueFromForm = getValueFromForm(expression);
+                     } else {
+                         valueFromForm = getValueFromForm(expression, items);
+                     }
+                     }
+                     logger.debug("valueFromDb : {}", valueFromDb);
+                     value = valueFromForm == null ? valueFromDb : valueFromForm;
+                     if (value == null) {
+                         logger.info("The value is " + value + "  for expression" + expression);
+                         throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
+                     }
+                     
+                 }
+             }
         }
-        return value;
-    }
-
-    
+            return value;
+        }
+             
     private String getValueFromDbOrForm(String fullExpression, Map<Integer, ItemBean> itemBeansI){
         List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
         fullExpression =

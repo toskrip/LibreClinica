@@ -79,7 +79,7 @@
 
 </script>
 
- <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+ <c:if test="${moduleManager!= '' && moduleManager!= null}">
 
       <script type="text/javascript">
         jQuery(document).ready(function() {
@@ -636,7 +636,7 @@
                               <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
-                              <a href="${deactivateParticipate}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${deactivateParticipate}" id="removeParticipateAccess" name="removeParticipateAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>
@@ -645,7 +645,7 @@
           </c:if>
 
 
-          <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+         <c:if test="${moduleManager!= '' && moduleManager!= null}">
           <tbody>
               <tr>
                   <td>&nbsp;</td>
@@ -653,7 +653,7 @@
                   <td>
                       <c:choose>
                           <c:when test="${randomizationOCStatus == 'disabled'}"><span id="randomizationStatus" class="randomization-inactive-status"><fmt:message key="randomization_status_deactivated" bundle="${resword}"/></span></c:when>
-                          <c:when test="${empty randomizationStatus}"><span id="randomizationStatus"><fmt:message key="randomization_status_notfound" bundle="${resword}"/></span></c:when>
+                          <c:when test="${empty randomizationStatus}"><span id="randomizationStatus" class="randomization-inactive-status"><fmt:message key="randomization_status_deactivated" bundle="${resword}"/></span></c:when>
                           <c:when test="${randomizationStatus == 'PENDING'}"><span id="randomizationStatus"><fmt:message key="randomization_status_pending" bundle="${resword}"/></span></c:when>
                           <c:when test="${randomizationStatus == 'ACTIVE'}"><span id="randomizationStatus" class="randomization-active-status"><fmt:message key="randomization_status_active" bundle="${resword}"/></span></c:when>
                           <c:when test="${randomizationStatus == 'INACTIVE'}"><span id="randomizationStatus" class="randomization-inactive-status"><fmt:message key="randomization_status_inactive" bundle="${resword}"/></span></c:when>
@@ -661,13 +661,7 @@
                   </td>
                   <td>
                     <span id="randomizeURL">
-                      <c:choose>
-                          <c:when test="${!empty randomizeURL && !empty randomizationStatus && randomizationStatus == 'ACTIVE'}">
                               <a href="<c:url value="${randomizeURL}"/>" target="_blank">${randomizeURL}</a>
-                          </c:when>
-                          <c:when test="${!empty randomizeURL}">${randomizeURL}</c:when>
-                          <c:otherwise>&nbsp;</c:otherwise>
-                      </c:choose>
                     </span>
                   </td>
                   <td>
@@ -680,8 +674,11 @@
                           <c:when test="${randomizationOCStatus == 'disabled'}">
                               <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
+                          <c:when test="${randomizationOCStatus == 'enabled' && empty randomizationStatus}">
+                              <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                          </c:when>
                           <c:otherwise>
-                              <a href="${deactivateRandomization}" id="removeAccess" name="removeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${deactivateRandomization}" id="removeRandomizeAccess" name="removeRandomizeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>
@@ -751,7 +748,7 @@
     </div>
 </c:if>
 
-    <c:if test="${configServerUrl!= '' && configServerUrl!= null}">
+ <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
         <form action="studymodule/${currentStudy.oid}/randomize" method="post">
             <h1>
