@@ -108,8 +108,9 @@ public class PformSubmissionService {
 	ItemGroupMetadataDAO igmdao;
 	DiscrepancyNoteDAO dndao;
 
-	public PformSubmissionService(DataSource ds) {
+	public PformSubmissionService(DataSource ds, AuthoritiesDao authoritiesDao) {
 		this.ds = ds;
+		this.authoritiesDao = authoritiesDao;
 	}
 
 	/**

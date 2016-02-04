@@ -133,6 +133,7 @@
    
 <bean id="pformSubmissionService" class="org.akaza.openclinica.service.PformSubmissionService" autowire="byName">
       <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="authoritiesDao"/>
     </bean>
      
     <bean id="ExpressionService" class="org.akaza.openclinica.service.rule.expression.ExpressionService">
