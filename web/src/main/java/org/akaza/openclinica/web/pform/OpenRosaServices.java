@@ -557,26 +557,26 @@ public class OpenRosaServices {
             return builder.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
-        try {
-            // Notify Participate of successful form submission.
-            String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/submission";
-            Submission submission = new Submission();
-            Study pManageStudy = new Study();
-            pManageStudy.setInstanceUrl(CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOID);
-            pManageStudy.setStudyOid(studyOID);
-            submission.setStudy(pManageStudy);
-            submission.setStudy_event_def_id(studyEventDefnId);
-            submission.setStudy_event_def_ordinal(studyEventOrdinal);
-            submission.setCrf_version_id(crfvdao.findByOid(crfVersionOID).getId());
-
-            RestTemplate rest = new RestTemplate();
-            String result = rest.postForObject(pManageUrl, submission, String.class);
-            LOGGER.debug("Notified Participate of CRF submission with a result of: " + result);
-        } catch (Exception e) {
-            LOGGER.error("Unable to notify Participate of successful CRF submission.");
-            LOGGER.error(e.getMessage());
-            LOGGER.error(ExceptionUtils.getStackTrace(e));
-        }
+//        try {
+//            // Notify Participate of successful form submission.
+//            String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/submission";
+//            Submission submission = new Submission();
+//            Study pManageStudy = new Study();
+//            pManageStudy.setInstanceUrl(CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOID);
+//            pManageStudy.setStudyOid(studyOID);
+//            submission.setStudy(pManageStudy);
+//            submission.setStudy_event_def_id(studyEventDefnId);
+//            submission.setStudy_event_def_ordinal(studyEventOrdinal);
+//            submission.setCrf_version_id(crfvdao.findByOid(crfVersionOID).getId());
+//
+//            RestTemplate rest = new RestTemplate();
+//            String result = rest.postForObject(pManageUrl, submission, String.class);
+//            LOGGER.debug("Notified Participate of CRF submission with a result of: " + result);
+//        } catch (Exception e) {
+//            LOGGER.error("Unable to notify Participate of successful CRF submission.");
+//            LOGGER.error(e.getMessage());
+//            LOGGER.error(ExceptionUtils.getStackTrace(e));
+//        }
 
         return builder.status(javax.ws.rs.core.Response.Status.CREATED).build();
     }
