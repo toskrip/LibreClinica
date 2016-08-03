@@ -5,6 +5,7 @@
  *
  * Copyright 2003-2009 Akaza Research
  */
+
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -44,26 +45,41 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 /**
+ * EventEndpoint resource for SOAP web services
+ *
  * @author Krikor Krumlian
- * 
+ * @author Jakob Rousseau
+ * @author Tomas Skripcak
  */
 @Endpoint
 public class EventEndpoint {
 
+    //region Finals
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/event/v1";
-    private String dateFormat;
 
     private final EventServiceInterface eventService;
     private final MessageSource messages;
     private final DataSource dataSource;
-    Locale locale;
+    private final Locale locale;
+
+    //endregion
+
+    //region Members
+
+    private String dateFormat;
+
+    //endregion
+
+    //region Constructors
 
     /**
      * Constructor
-     * 
-     * @param subjectService
-     * @param cctsService
+     *
+     * @param eventService eventService
+     * @param dataSource dataSource
+     * @param messages messages
      */
     public EventEndpoint(EventServiceInterface eventService, DataSource dataSource, MessageSource messages) {
         this.eventService = eventService;
@@ -72,15 +88,44 @@ public class EventEndpoint {
         this.locale = new Locale("en_US");
     }
 
+    //endregion
+
+    //region Properties
+
+    /**
+     * DateFormat Getter
+     * @return String dateFormat
+     */
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    /**
+     * DateFormat Setter
+     * @param dateFormat string dateformat
+     */
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public EventServiceInterface getEventService() {
+        return eventService;
+    }
+
+    //endregion
+
+    //region Methods
+
     /**
      * if NAMESPACE_URI_V1:scheduleRequest execute this method
-     * 
+     *
      */
+    @SuppressWarnings("unused")
     @PayloadRoot(localPart = "scheduleRequest", namespace = NAMESPACE_URI_V1)
     public Source createSubject(@XPathParam("//e:event") NodeList event, @XPathParam("//e:study") String study,
-            @XPathParam("//e:eventDefinitionOID") String eventDefinitionOID, @XPathParam("//e:location") String location,
-            @XPathParam("//e:startDate") String startDate, @XPathParam("//e:startTime") String startTime, @XPathParam("//e:endDate") String endDate,
-            @XPathParam("//e:endTime") String endTime) throws Exception {
+                                @XPathParam("//e:eventDefinitionOID") String eventDefinitionOID, @XPathParam("//e:location") String location,
+                                @XPathParam("//e:startDate") String startDate, @XPathParam("//e:startTime") String startTime, @XPathParam("//e:endDate") String endDate,
+                                @XPathParam("//e:endTime") String endTime) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element eventElement = (Element) event.item(0);
         StudyEventTransferBean studyEventTransferBean = unMarshallToEventTransfer(eventElement);
@@ -94,10 +139,10 @@ public class EventEndpoint {
 
             try {
                 HashMap<String, String> h =
-                    getEventService().scheduleEvent(studyEventTransferBean.getUser(), studyEventTransferBean.getStartDateTime(),
-                            studyEventTransferBean.getEndDateTime(), studyEventTransferBean.getLocation(), studyEventTransferBean.getStudyUniqueId(),
-                            studyEventTransferBean.getSiteUniqueId(), studyEventTransferBean.getEventDefinitionOID(), 
-                            studyEventTransferBean.getSubjectLabel());
+                        getEventService().scheduleEvent(studyEventTransferBean.getUser(), studyEventTransferBean.getStartDateTime(),
+                                studyEventTransferBean.getEndDateTime(), studyEventTransferBean.getLocation(), studyEventTransferBean.getStudyUniqueId(),
+                                studyEventTransferBean.getSiteUniqueId(), studyEventTransferBean.getEventDefinitionOID(),
+                                studyEventTransferBean.getSubjectLabel());
                 return new DOMSource(mapSuccessConfirmation(h));
             } catch (OpenClinicaSystemException ose) {
                 errors.reject("eventEndpoint.cannot_schedule", "Cannot schedule an event for this Subject.");
@@ -110,9 +155,9 @@ public class EventEndpoint {
 
     /**
      * Create Success Response
-     * 
-     * @param confirmation
-     * @return
+     *
+     * @param confirmation confirmation map
+     * @return Element
      * @throws Exception
      */
     private Element mapSuccessConfirmation(HashMap<String, String> confirmation) throws Exception {
@@ -139,52 +184,55 @@ public class EventEndpoint {
 
     /**
      * Process createEvent request by creating StudyEventTransferBean from received payload.
-     * 
-     * @param subjectElement
+     *
+     * @param eventElement eventElement
      * @return SubjectTransferBean
      * @throws ParseException
      */
-    private StudyEventTransferBean unMarshallToEventTransfer(Element eventElement)
-    	throws ParseException {
+    private StudyEventTransferBean unMarshallToEventTransfer(Element eventElement) throws ParseException {
 
-   
+        Element eventDefinitionOidElement = DomUtils.getChildElementByTagName(eventElement, "eventDefinitionOID");
+        Element locationElement = DomUtils.getChildElementByTagName(eventElement, "location");
+        Element startDateElement = DomUtils.getChildElementByTagName(eventElement, "startDate");
+        Element endDateElement = DomUtils.getChildElementByTagName(eventElement, "endDate");
+        Element startTimeElement = DomUtils.getChildElementByTagName(eventElement, "startTime");
+        Element endTimeElement = DomUtils.getChildElementByTagName(eventElement, "endTime");
 
-    Element eventDefinitionOidElement = DomUtils.getChildElementByTagName(eventElement, "eventDefinitionOID");
-    Element locationElement = DomUtils.getChildElementByTagName(eventElement, "location");
-    Element startDateElement = DomUtils.getChildElementByTagName(eventElement, "startDate");
-    Element endDateElement = DomUtils.getChildElementByTagName(eventElement, "endDate");
-    Element startTimeElement = DomUtils.getChildElementByTagName(eventElement, "startTime");
-    Element endTimeElement = DomUtils.getChildElementByTagName(eventElement, "endTime");
+        Element subjectRefElement = DomUtils.getChildElementByTagName(eventElement, "studySubjectRef");
+        Element labelElement = DomUtils.getChildElementByTagName(subjectRefElement, "label");
 
-    Element subjectRefElement = DomUtils.getChildElementByTagName(eventElement, "studySubjectRef");
-    Element labelElement = DomUtils.getChildElementByTagName(subjectRefElement, "label");
+        Element studyRefElement = DomUtils.getChildElementByTagName(eventElement, "studyRef");
+        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
+        Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
+        Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
 
-    Element studyRefElement = DomUtils.getChildElementByTagName(eventElement, "studyRef");
-    Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
-    Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
-    Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
+        String studySubjectId = DomUtils.getTextValue(labelElement).trim();
+        String eventDefinitionOID = DomUtils.getTextValue(eventDefinitionOidElement).trim();
+        String studyIdentifier = DomUtils.getTextValue(studyIdentifierElement).trim();
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
+        String location = locationElement == null ? null : DomUtils.getTextValue(locationElement).trim();
+        String startDate = DomUtils.getTextValue(startDateElement).trim();
+        String startTime = startTimeElement == null ? null : DomUtils.getTextValue(startTimeElement).trim();
+        String endDate = endDateElement == null ? null : DomUtils.getTextValue(endDateElement).trim();
+        String endTime = endTimeElement == null ? null : DomUtils.getTextValue(endTimeElement).trim();
 
-    String studySubjectId = DomUtils.getTextValue(labelElement).trim();
-    String eventDefinitionOID = DomUtils.getTextValue(eventDefinitionOidElement).trim();
-    String studyIdentifier = DomUtils.getTextValue(studyIdentifierElement).trim();
-    String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
-    String location = locationElement == null ? null : DomUtils.getTextValue(locationElement).trim();
-    String startDate = DomUtils.getTextValue(startDateElement).trim();
-    String startTime = startTimeElement == null ? null : DomUtils.getTextValue(startTimeElement).trim();
-    String endDate = endDateElement == null ? null : DomUtils.getTextValue(endDateElement).trim();
-    String endTime = endTimeElement == null ? null : DomUtils.getTextValue(endTimeElement).trim();
+        return new StudyEventTransferBean(
+                studySubjectId,
+                studyIdentifier,
+                siteIdentifier,
+                eventDefinitionOID,
+                location,
+                getDate(startDate, startTime),
+                getDate(endDate, endTime),
+                getUserAccount()
+        );
+    }
 
-    StudyEventTransferBean studyEventTransferBean =
-        new StudyEventTransferBean(studySubjectId, studyIdentifier, siteIdentifier, eventDefinitionOID, location, getDate(startDate, startTime), getDate(
-                endDate, endTime), getUserAccount());
-    return studyEventTransferBean;
-}
-    
     /**
      * Create Error Response
-     * 
-     * @param confirmation
-     * @return
+     *
+     * @param errors errors
+     * @return element
      * @throws Exception
      */
     private Element mapFailConfirmation(Errors errors) throws Exception {
@@ -202,19 +250,20 @@ public class EventEndpoint {
             errorElement.setTextContent(theMessage);
             responseElement.appendChild(errorElement);
         }
-        return responseElement;
 
+        return responseElement;
     }
 
     /**
      * Helper Method to resolve dates
-     * 
-     * @param dateAsString
-     * @return
+     *
+     * @param dateAsString dateAsString
+     * @param hourMinuteAsString hourMinuteAsString
+     * @return Date
      * @throws ParseException
      */
     private Date getDate(String dateAsString, String hourMinuteAsString) throws ParseException {
-        Date d = null;
+        Date d;
         if (dateAsString != null && dateAsString.length() != 0) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             dateAsString += hourMinuteAsString == null ? " 00:00" : " " + hourMinuteAsString;
@@ -223,45 +272,24 @@ public class EventEndpoint {
                 throw new OpenClinicaSystemException("Date not parseable");
             }
             return sdf.parse(dateAsString);
-        } else {
+        }
+        else {
             return null;
         }
-
     }
 
     /**
      * Helper Method to get the user account
-     * 
+     *
      * @return UserAccountBean
      */
     private UserAccountBean getUserAccount() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = null;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
+        String username = principal instanceof UserDetails ? ((UserDetails) principal).getUsername() : principal.toString();
         UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
         return (UserAccountBean) userAccountDao.findByUserName(username);
     }
 
-    /**
-     * @return
-     */
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
-    /**
-     * @param dateFormat
-     */
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
-    }
-
-    public EventServiceInterface getEventService() {
-        return eventService;
-    }
+    //endregion
 
 }

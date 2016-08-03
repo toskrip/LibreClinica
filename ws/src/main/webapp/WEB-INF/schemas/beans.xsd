@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://openclinica.org/ws/beans"
-    xmlns:beans="http://openclinica.org/ws/beans" elementFormDefault="qualified">
+<schema
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openclinica.org/ws/beans"
+    xmlns:beans="http://openclinica.org/ws/beans"
+    elementFormDefault="qualified"
+    >
 
     <complexType name="eventType">
         <sequence>
@@ -14,15 +18,45 @@
             <element name="endTime" type="time" minOccurs="0"/>
         </sequence>
     </complexType>
-    
-    <complexType name="eventsType">
+
+    <complexType name="eventResponseType">
         <sequence>
-            <element name="event" type="beans:eventType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="studySubjectRef" type="beans:studySubjectRefType"/>
+            <element name="studyRef" type="beans:studyRefType"/>
+            <element name="eventDefinitionOID" type="beans:customStringType"/>
+            <element name="occurrence" type="beans:customStringType" minOccurs="0" maxOccurs="1"/>
+            <element name="status" type="beans:customStringType" minOccurs="0" maxOccurs="1"/>
+            <element name="subjectEventStatus" type="beans:customStringType" minOccurs="0" maxOccurs="1"/>
+            <element name="location" type="beans:customStringType"/>
+            <element name="startDate" type="date"/>
+            <element name="startTime" type="time"/>
+            <element name="endDate" type="date"/>
+            <element name="endTime" type="time"/>
+            <element name="eventCrfInformation" type="beans:eventCrfInformationList" minOccurs="0" maxOccurs="unbounded" />
         </sequence>
     </complexType>
-    
-    
 
+    <complexType name="eventCrfInformationList">
+        <sequence>
+            <element name="eventCrf" type="beans:eventCrfType" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+    </complexType>
+
+    <complexType name="eventsType">
+        <sequence>
+            <element name="event" type="beans:eventResponseType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="eventCrfType">
+        <!-- The element 'name' corresponds to the column name in the table 'crf'. -->
+        <sequence>
+            <element name="name" type="beans:customStringType" />
+            <element name="oid" type="beans:customStringType" />
+            <element name="status" type="beans:customStringType"/>
+            <element name="version" type="beans:customStringType"/>
+        </sequence>
+    </complexType>
 
     <complexType name="studySubjectType">
         <sequence>
@@ -33,7 +67,7 @@
             <element name="studyRef" type="beans:studyRefType"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="studySubjectWithEventsType">
         <sequence>
             <element name="label" type="beans:customStringType" minOccurs="0"/>
@@ -44,7 +78,7 @@
             <element name="events" type="beans:eventsType" />
         </sequence>
     </complexType>
-  
+
     <complexType name="subjectType">
         <sequence>
             <element name="uniqueIdentifier" type="beans:customStringType" minOccurs="0"/>
@@ -55,14 +89,13 @@
             </choice>
         </sequence>
     </complexType>
-    
+
     <complexType name="studiesType">
         <sequence>
             <element name="study" type="beans:studyType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
-    
-    
+
     <complexType name="studyType">
         <sequence>
             <element name="identifier" type="beans:customStringType"/>
@@ -71,14 +104,13 @@
             <element name="sites" type="beans:sitesType"/>
         </sequence>
     </complexType>
-    
-    
+
     <complexType name="sitesType">
         <sequence>
             <element name="site" type="beans:siteType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="siteType">
         <sequence>
             <element name="identifier" type="beans:customStringType"/>
@@ -86,22 +118,20 @@
             <element name="name" type="beans:customStringType"/>
         </sequence>
     </complexType>
-    
-    
+
     <complexType name="studySubjectsType">
         <sequence>
             <element name="studySubject" type="beans:studySubjectWithEventsType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
-    
-    
+
     <complexType name="studyEventDefinitionsType">
         <sequence>
             <element name="studyEventDefinition" type="beans:studyEventDefinitionType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
-    
-    
+
+
     <complexType name="studyEventDefinitionType">
         <sequence>
             <element name="oid" type="beans:customStringType"/>
@@ -109,13 +139,13 @@
             <element name="eventDefinitionCrfs" type="beans:crfsType"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="eventDefinitionCrfsType">
         <sequence>
             <element name="eventDefinitionCrf" type="beans:eventDefinitionCrfType" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="eventDefinitionCrfType">
         <sequence>
             <element name="required" type="boolean"/>
@@ -123,44 +153,47 @@
             <element name="passwordRequired" type="boolean"/>
             <element name="hideCrf" type="boolean"/>
             <element name="participantForm" type="boolean"/>
+            <element name="allowAnonymousSubmission" type="boolean"/>
+            <element name="submissionUrl" type="beans:customStringType"/>
+            <element name="offline" type="boolean"/>
             <element name="sourceDataVerificaiton" type="beans:customStringType"/>
             <element name="crf" type="beans:crfObjType" minOccurs="1"/>
             <element name="defaultCrfVersion" type="beans:crfVersionType" minOccurs="1"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="crfsType">
         <sequence>
             <element name="crf" type="beans:crfObjType" minOccurs="0" maxOccurs="1"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="crfObjType">
         <sequence>
             <element name="oid" type="beans:customStringType"/>
             <element name="name" type="beans:customStringType"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="crfVersionType">
         <sequence>
             <element name="oid" type="beans:customStringType"/>
             <element name="name" type="beans:customStringType"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="listStudySubjectsInStudyType">
         <sequence>
             <element name="studyRef" type="beans:studyRefType"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="studyEventDefinitionListAllType">
         <sequence>
             <element name="studyRef" type="beans:studyRefType"/>
         </sequence>
     </complexType>
-    
+
     <complexType name="studyMetadataType">
         <sequence>
             <element name="studyRef" type="beans:studyRefType"/>

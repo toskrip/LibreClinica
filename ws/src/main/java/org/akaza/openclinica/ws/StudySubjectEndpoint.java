@@ -5,36 +5,32 @@
  *
  * Copyright 2003-2009 Akaza Research
  */
+
 package org.akaza.openclinica.ws;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
-import org.openclinica.ws.beans.EventType;
-import org.openclinica.ws.beans.EventsType;
-import org.openclinica.ws.beans.GenderType;
-import org.openclinica.ws.beans.ListStudySubjectsInStudyType;
-import org.openclinica.ws.beans.StudyRefType;
-import org.openclinica.ws.beans.StudySubjectWithEventsType;
-import org.openclinica.ws.beans.StudySubjectsType;
-import org.openclinica.ws.beans.SubjectType;
+import org.openclinica.ws.beans.*;
 import org.openclinica.ws.studysubject.v1.ListAllByStudyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,15 +48,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
@@ -70,31 +57,49 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
+ * StudySubjectEndpoint resource for SOAP web services
+ *
  * @author Krikor Krumlian
- * 
+ * @author Jakob Rousseau
+ * @author Tomas Skripcak
  */
 @Endpoint
 public class StudySubjectEndpoint {
 
+    //region Finals
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/studySubject/v1";
-    private String dateFormat;
 
     private final SubjectServiceInterface subjectService;
     private final DataSource dataSource;
     private final MessageSource messages;
-    StudyDAO studyDao;
-    UserAccountDAO userAccountDao;
-    SubjectDAO subjectDao;
     private final Locale locale;
+
+    //endregion
+
+    //region Members
+
+    private String dateFormat;
+
+    private StudyDAO studyDao;
+    private UserAccountDAO userAccountDao;
+    private SubjectDAO subjectDao;
+
+    //endregion
+
+    //region Constructors
 
     /**
      * Constructor
-     * 
-     * @param subjectService
-     * @param dataSource
+     *
+     * @param subjectService subjectService
+     * @param dataSource dataSource
      */
     public StudySubjectEndpoint(SubjectServiceInterface subjectService, DataSource dataSource, MessageSource messages) {
         this.subjectService = subjectService;
@@ -103,18 +108,54 @@ public class StudySubjectEndpoint {
         this.locale = new Locale("en_US");
     }
 
+    //endregion
+
+    //region Properties
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public StudyDAO getStudyDao() {
+        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+        return studyDao;
+    }
+
+    public UserAccountDAO getUserAccountDao() {
+        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+        return userAccountDao;
+    }
+
+    public SubjectDAO getSubjectDao() {
+        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+        return subjectDao;
+    }
+
+    public MessageSource getMessages() {
+        return messages;
+    }
+
+    //endregion
+
+    //region Methods
+
     /**
-     * Use this method to create new study subjects in OpenClinica.
-     * 
-     * @param subject
+     * Use this method to create new study subjects in OpenClinica
+     *
+     * @param subject subject
      * @return Source
      * @throws Exception
      */
+    @SuppressWarnings("unused")
     @PayloadRoot(localPart = "createRequest", namespace = NAMESPACE_URI_V1)
     public Source createStudySubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
-    	Errors errors = null;
-    	try {
-        	
+        Errors errors = null;
+
+        try {
             ResourceBundleProvider.updateLocale(locale);
             Element subjectElement = (Element) subject.item(0);
             SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
@@ -128,31 +169,32 @@ public class StudySubjectEndpoint {
                 String label = create(subjectTransferBean);
                 return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
             } else {
-               return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
+                return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
             }
         } catch (NullPointerException npe) {
             npe.printStackTrace();
             return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Null Pointer Exception", locale), null, errors));
         } catch(Exception e){
-        	  List<String> error_messages = new ArrayList<String>();
-        	  error_messages.add(e.getMessage());
-        	  return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null,  errors, "label", error_messages) );
-         }
+            List<String> error_messages = new ArrayList<>();
+            error_messages.add(e.getMessage());
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null,  errors, "label", error_messages) );
+        }
     }
 
     /**
      * Use this method to list all study subjects. Scheduled event data will also be show if available.
-     * 
-     * @param requestElement
+     *
+     * @param requestElement requestElement
      * @return ListAllByStudyResponse
      * @throws Exception
      */
+    @SuppressWarnings("unused")
     @PayloadRoot(localPart = "listAllByStudyRequest", namespace = NAMESPACE_URI_V1)
     public ListAllByStudyResponse listStudySubjectsInStudy(JAXBElement<ListStudySubjectsInStudyType> requestElement) throws Exception {
         try {
             ResourceBundleProvider.updateLocale(new Locale("en_US"));
             ListStudySubjectsInStudyType listStudySubjectsInStudyType = requestElement.getValue();
-            StudyBean study = null;
+            StudyBean study;
             try {
                 study = validateRequestAndReturnStudy(listStudySubjectsInStudyType.getStudyRef());
             } catch (OpenClinicaSystemException e) {
@@ -170,20 +212,20 @@ public class StudySubjectEndpoint {
         }
     }
 
-    
+
     /**
-       * Use this method to find if studysubject exists by study/site/subject lable.
-     * 
-     * @param requestElement
+     * Use this method to find if studySubject exists by study/site/subject table
+     *
+     * @param subject subject
      * @return studySubjectOID
      * @throws Exception
-  */
+     */
+    @SuppressWarnings("unused")
     @PayloadRoot(localPart = "isStudySubjectRequest", namespace = NAMESPACE_URI_V1)
-    public Source isStudySubject( @XPathParam("//studySubject:studySubject") NodeList subject
-    		) throws Exception {
-    	ResourceBundleProvider.updateLocale(locale);
+    public Source isStudySubject( @XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
+        ResourceBundleProvider.updateLocale(locale);
         Element subjectElement = (Element) subject.item(0);
-       // Element studyElement = (Element) study.item(0);
+        //Element studyElement = (Element) study.item(0);
         SubjectStudyDefinitionBean subjectStudyBean = unMarshallToSubjectStudy(subjectElement);//,studyElement);
 
         DataBinder dataBinder = new DataBinder((subjectStudyBean));
@@ -192,25 +234,25 @@ public class StudySubjectEndpoint {
         subjectTransferValidator.validateIsSubjectExists((subjectStudyBean), errors);
         if (subjectStudyBean.getSubjectOIDId() == null ){//case for core misfunction
             errors.reject("studySubjectEndpoint.fail");
-            
-       }
+
+        }
         if (!errors.hasErrors()) {
-           
-            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, 
-            		"Success", locale), subjectStudyBean.getSubjectOIDId(), errors,"subjectOID"));
+
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null,
+                    "Success", locale), subjectStudyBean.getSubjectOIDId(), errors,"subjectOID"));
 
         } else {
             return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
-            
+
         }
     }
-    
+
     /**
      * Build the response for listStudySubjectsInStudy method
-     * 
-     * @param study
-     * @param message
-     * @param studyRef
+     *
+     * @param study study StudyBean
+     * @param message String message
+     * @param studyRef studyRef
      * @return ListAllByStudyResponse
      * @throws Exception
      */
@@ -219,6 +261,10 @@ public class StudySubjectEndpoint {
         response.setResult(message);
         StudySubjectsType studySubjectsType = new StudySubjectsType();
         response.setStudySubjects(studySubjectsType);
+        // 100 is a large value to avoid any map reallocation activity. The map contains the site
+        // specific StudyRefTypes to be able to output the site's identifier
+        Map<Integer, StudyRefType> studyIDRefMap = new HashMap<>(100);
+        studyIDRefMap.put(study.getId(), studyRef);
         List<StudySubjectBean> studySubjects = this.subjectService.getStudySubject(study);
         for (StudySubjectBean studySubjectBean : studySubjects) {
             StudySubjectWithEventsType studySubjectType = new StudySubjectWithEventsType();
@@ -226,19 +272,29 @@ public class StudySubjectEndpoint {
             studySubjectType.setLabel(studySubjectBean.getLabel());
             studySubjectType.setSecondaryLabel(studySubjectBean.getSecondaryLabel());
             if ( studySubjectBean.getEnrollmentDate() != null){
-            	studySubjectType.setEnrollmentDate(getXMLGregorianCalendarDate(studySubjectBean.getEnrollmentDate()));
+                studySubjectType.setEnrollmentDate(getXMLGregorianCalendarDate(studySubjectBean.getEnrollmentDate()));
             }
             SubjectBean subjectBean = (SubjectBean) getSubjectDao().findByPK(studySubjectBean.getSubjectId());
             subjectType.setUniqueIdentifier(subjectBean.getUniqueIdentifier());
             String genderStr = String.valueOf(subjectBean.getGender());
             if (!"".equals(genderStr.trim())){
-            	subjectType.setGender(GenderType.fromValue(genderStr));
+                subjectType.setGender(GenderType.fromValue(genderStr));
             }
             if ( subjectBean.getDateOfBirth() != null){
-            	subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
+                subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
             }
             studySubjectType.setSubject(subjectType);
-            // studySubjectType.setStudyRef(studyRef);
+            int studyIDSubject = studySubjectBean.getStudyId();
+            StudyRefType studyRefOutput = studyIDRefMap.get(studyIDSubject);
+            if (studyRefOutput == null) {
+                StudyBean siteStudy = (StudyBean) getStudyDao().findByPK(studyIDSubject);
+                studyRefOutput = new StudyRefType();
+                studyRefOutput.setIdentifier(siteStudy.getIdentifier());
+                studyIDRefMap.put(studyIDSubject, studyRefOutput);
+            }
+
+            studySubjectType.setStudyRef(studyRefOutput);
+
             logger.debug(studySubjectBean.getLabel());
             studySubjectType.setEvents(getEvents(studySubjectBean));
             studySubjectsType.getStudySubject().add(studySubjectType);
@@ -249,8 +305,8 @@ public class StudySubjectEndpoint {
 
     /**
      * Build Events sub section for ListStudySubjectsInStudyResponse
-     * 
-     * @param studySubject
+     *
+     * @param studySubject studySubject
      * @return EventsType
      * @throws Exception
      */
@@ -259,82 +315,120 @@ public class StudySubjectEndpoint {
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         EventsType eventsType = new EventsType();
         List<StudyEventBean> events = eventDao.findAllByStudySubject(studySubject);
-        StudyEventDefinitionBean eb=null;
+
         for (StudyEventBean studyEventBean : events) {
-        	 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean.getStudyEventDefinitionId());
-        	 studyEventBean.setStudyEventDefinition(sed);
-            
-             EventType eventType = new EventType();
-            eventType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
-            eventType.setLocation(studyEventBean.getLocation());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean.getStudyEventDefinitionId());
+            studyEventBean.setStudyEventDefinition(sed);
+
+
+            EventResponseType eventResponseType = new EventResponseType();
+            eventResponseType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
+            eventResponseType.setStatus(studyEventBean.getStatus().getName());
+            eventResponseType.setOccurrence(studyEventBean.getSampleOrdinal() + "");
+            eventResponseType.setSubjectEventStatus(studyEventBean.getSubjectEventStatus().getName());
+            eventResponseType.setLocation(studyEventBean.getLocation());
             if ( studyEventBean.getDateStarted() != null){
-            	eventType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
-            	eventType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
+                eventResponseType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
+                eventResponseType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
             }
             if ( studyEventBean.getDateEnded() != null){
-	            eventType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
-	            eventType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
+                eventResponseType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
+                eventResponseType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
             }
-            
-            
-            eventsType.getEvent().add(eventType);
-            logger.debug(eventType.getEventDefinitionOID()+" "+eventType.getStartDate());
-            
+            EventCrfInformationList eventCrfInformationList = createEventCrfInformationList(studyEventBean);
+            eventResponseType.getEventCrfInformation().add(eventCrfInformationList);
+
+            eventsType.getEvent().add(eventResponseType);
+            logger.debug(eventResponseType.getEventDefinitionOID()+" "+eventResponseType.getStartDate());
+
         }
         return eventsType;
     }
 
+    private EventCrfInformationList createEventCrfInformationList(StudyEventBean studyEventBean) {
+        EventCrfInformationList eventCrfInformationList = new EventCrfInformationList ();
+
+        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
+        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+        CRFDAO crfdao = new CRFDAO(dataSource);
+
+        List<EventCRFBean> eventCRFBeanList = eventCRFDAO.findAllByStudyEvent(studyEventBean);
+        for (EventCRFBean eventCRFBean : eventCRFBeanList) {
+            CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDAO.findByPK(eventCRFBean.getCRFVersionId());
+            CRFBean crf = crfdao.findByVersionId(crfVersionBean.getCrfId());
+            EventCrfType eventCrfType = new EventCrfType();
+            eventCrfType.setStatus(eventCRFBean.getStage().getName());
+            eventCrfType.setName(crf.getName());
+            eventCrfType.setVersion(crfVersionBean.getName());
+            eventCrfType.setOid(crfVersionBean.getOid());
+            eventCrfInformationList.getEventCrf().add(eventCrfType);
+        }
+
+        return eventCrfInformationList;
+    }
+
     /**
-     * Validate the listStudySubjectsInStudy request.
-     * 
-     * @param studyRef
+     * Validate the listStudySubjectsInStudy request
+     *
+     * @param studyRef studyRef
      * @return StudyBean
      */
     private StudyBean validateRequestAndReturnStudy(StudyRefType studyRef) {
 
         String studyIdentifier = studyRef == null ? null : studyRef.getIdentifier().trim();
-        String siteIdentifier = studyRef.getSiteRef() == null ? null : studyRef.getSiteRef().getIdentifier().trim();
+        String siteIdentifier = (studyRef == null || studyRef.getSiteRef() == null) ? null : studyRef.getSiteRef().getIdentifier().trim();
 
-        if (studyIdentifier == null && siteIdentifier == null) {
-            throw new OpenClinicaSystemException("studySubjectEndpoint.provide_valid_study_site", "Provide a valid study/site.");
-        }
-        if (studyIdentifier != null && siteIdentifier == null) {
-            StudyBean study = getStudyDao().findByUniqueIdentifier(studyIdentifier);
-            if (study == null) {
-                throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_identifier", "The study identifier you provided is not valid.");
-            }
-            StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), study.getId());
-            if (studySur.getStatus() != Status.AVAILABLE) {
-                throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
-                        "You do not have sufficient privileges to proceed with this operation.");
-            }
-            return study;
-        }
         if (studyIdentifier != null && siteIdentifier != null) {
             StudyBean study = getStudyDao().findByUniqueIdentifier(studyIdentifier);
             StudyBean site = getStudyDao().findByUniqueIdentifier(siteIdentifier);
+
             if (study == null || site == null || site.getParentStudyId() != study.getId()) {
-                throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_site_identifier",
-                        "The study/site identifier you provided is not valid.");
+                throw new OpenClinicaSystemException(
+                        "studySubjectEndpoint.invalid_study_site_identifier",
+                        "The study/site identifier you provided is not valid."
+                );
             }
+
             StudyUserRoleBean siteSur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), site.getId());
             if (siteSur.getStatus() != Status.AVAILABLE) {
-                throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
-                        "You do not have sufficient privileges to proceed with this operation.");
+                throw new OpenClinicaSystemException(
+                        "studySubjectEndpoint.insufficient_permissions",
+                        "You do not have sufficient privileges to proceed with this operation."
+                );
             }
+
             return site;
         }
-        return null;
+        else if (studyIdentifier == null) {
+            throw new OpenClinicaSystemException("studySubjectEndpoint.provide_valid_study_site", "Provide a valid study/site.");
+        }
+        else {
+            StudyBean study = getStudyDao().findByUniqueIdentifier(studyIdentifier);
+            if (study == null) {
+                throw new OpenClinicaSystemException(
+                        "studySubjectEndpoint.invalid_study_identifier",
+                        "The study identifier you provided is not valid."
+                );
+            }
+            StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), study.getId());
+            if (studySur.getStatus() != Status.AVAILABLE) {
+                throw new OpenClinicaSystemException(
+                        "studySubjectEndpoint.insufficient_permissions",
+                        "You do not have sufficient privileges to proceed with this operation."
+                );
+            }
+            return study;
+        }
     }
 
     /**
-     * Process createStudySubject request by creating SubjectTransferBean from received payload.
-     * 
-     * @param subjectElement
+     * Process createStudySubject request by creating SubjectTransferBean from received payload
+     *
+     * @param subjectElement subjectElement
      * @return SubjectTransferBean
-     * @throws ParseException
+     * @throws Exception
      */
-    private SubjectTransferBean unMarshallToSubjectTransfer(Element subjectElement) throws ParseException, Exception {
+    private SubjectTransferBean unMarshallToSubjectTransfer(Element subjectElement) throws Exception {
 
         Element studySubjectIdElement = DomUtils.getChildElementByTagName(subjectElement, "label");
         Element secondaryIdElement = DomUtils.getChildElementByTagName(subjectElement, "secondaryLabel");
@@ -365,9 +459,7 @@ public class StudySubjectEndpoint {
         subjectTransferBean.setSiteIdentifier(siteIdentifier);
         subjectTransferBean.setPersonId(personIdValue);
         subjectTransferBean.setStudySubjectId(studySubjectIdValue);
-        if (genderValue == null || genderValue.length()<1) {
-            // Do nothing
-        } else {
+        if (genderValue != null && genderValue.length() >= 1) {
             subjectTransferBean.setGender(genderValue.toCharArray()[0]);
         }
         subjectTransferBean.setDateOfBirth((dateOfBirthValue == null || dateOfBirthValue.length()==0)? null : getDate(dateOfBirthValue));
@@ -381,9 +473,9 @@ public class StudySubjectEndpoint {
     }
 
     /**
-     * Process createStudySubject request by creating SubjectStudyDefinitionBean from received payload.
-     * 
-     * @param subjectElement
+     * Process createStudySubject request by creating SubjectStudyDefinitionBean from received payload
+     *
+     * @param subjectStudyElement subjectStudyElement
      * @return SubjectTransferBean
      * @throws ParseException
      */
@@ -399,17 +491,18 @@ public class StudySubjectEndpoint {
         String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();
         String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
 
-        SubjectStudyDefinitionBean subjectTransferBean = new SubjectStudyDefinitionBean(
-        		studyIdentifier,  siteIdentifier, 
-        		getUserAccount(),  studySubjectIdValue);
-
-  
-        return subjectTransferBean;
+        return new SubjectStudyDefinitionBean(
+                studyIdentifier,
+                siteIdentifier,
+                getUserAccount(),
+                studySubjectIdValue
+        );
     }
+
     /**
-     * Create the Subject object if it is not already in the system.
-     * 
-     * @param subjectTransferBean
+     * Create the Subject object if it is not already in the system
+     *
+     * @param subjectTransferBean subjectTransferBean
      * @return String
      */
     private String create(SubjectTransferBean subjectTransferBean) {
@@ -420,22 +513,26 @@ public class StudySubjectEndpoint {
 //            logger.debug("SubjectInMain");
 //            throw new OpenClinicaSystemException("Duplicate label");
 //        } else {
-            logger.debug("creating subject transfer");
-            return createSubject(subjectTransferBean);
+        logger.debug("creating subject transfer");
+        return createSubject(subjectTransferBean);
         //}
     }
 
     /**
-     * @param subjectTransferBean
-     * @return
+     * Determine whether subject exists
+     *
+     * @param subjectTransferBean subjectTransferBean
+     * @return true if subject exists
      */
+    @SuppressWarnings("unused")
     private boolean doesSubjectExist(SubjectTransferBean subjectTransferBean) {
         // TODO: Implement this
         StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
         StudyDAO studyDao = new StudyDAO(dataSource);
         StudyBean studyBean = studyDao.findByUniqueIdentifier(subjectTransferBean.getStudy().getIdentifier());
         StudySubjectBean ssbean = ssdao.findByLabelAndStudy(subjectTransferBean.getStudySubjectId(), studyBean);
-        return ssbean.getId() > 0 ? true : false;
+
+        return ssbean.getId() > 0;
     }
 
     private String createSubject(SubjectTransferBean subjectTransfer) {
@@ -445,11 +542,11 @@ public class StudySubjectEndpoint {
         subject.setDateOfBirth(subjectTransfer.getDateOfBirth());
         // below added tbh 04/2011
         if (subject.getDateOfBirth() != null) {
-        	subject.setDobCollected(true);
+            subject.setDobCollected(true);
         } else {
-        	subject.setDobCollected(false);
+            subject.setDobCollected(false);
         }
-        // >> above added tbh 04/2011, mantis issue having to 
+        // >> above added tbh 04/2011, mantis issue having to
         // deal with not being able to change DOB after a submit
         subject.setGender(subjectTransfer.getGender());
         if (subjectTransfer.getOwner() != null) {
@@ -461,7 +558,7 @@ public class StudySubjectEndpoint {
 
     /**
      * Create createStudySubject request Build the response for createStudySubject method
-     * 
+     *
      * @param confirmation
      *            operation result
      * @param studySubjectLabel
@@ -470,12 +567,12 @@ public class StudySubjectEndpoint {
      * @throws Exception
      * @see #createStudySubject
      */
-    
+
     private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors) throws Exception  	{
-    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, "label", null) ;    	}
-    
+        return  mapConfirmation( confirmation,  studySubjectLabel,  errors, "label", null) ;    	}
+
     private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label) throws Exception  	{
-    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, label, null) ;    
+        return  mapConfirmation( confirmation,  studySubjectLabel,  errors, label, null) ;
     }
 
     private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label,  List<String> error_messages) throws Exception {
@@ -487,57 +584,59 @@ public class StudySubjectEndpoint {
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
         resultElement.setTextContent(confirmation);
         responseElement.appendChild(resultElement);
-        
-        if ( studySubjectLabel != null){
-	        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, label);
-	        labelElement.setTextContent(studySubjectLabel);
-	        responseElement.appendChild(labelElement);
+
+        if (studySubjectLabel != null){
+            Element labelElement = document.createElementNS(NAMESPACE_URI_V1, label);
+            labelElement.setTextContent(studySubjectLabel);
+            responseElement.appendChild(labelElement);
         }
-     
-        if ( errors != null){
-	        for (ObjectError error : errors.getAllErrors()) {
-	            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
-	            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
-	            errorElement.setTextContent(theMessage);
-	            responseElement.appendChild(errorElement);
-	        }
+
+        if (errors != null){
+            for (ObjectError error : errors.getAllErrors()) {
+                Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+                String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+                errorElement.setTextContent(theMessage);
+                responseElement.appendChild(errorElement);
+            }
         }
-        if ( error_messages != null && error_messages.size()>0){
-	    	StringBuilder output_msg = new StringBuilder();
-	        for (String mes : error_messages){
-	        	output_msg.append(mes);
-	        }
-	    	Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
-	        msgElement.setTextContent(output_msg.toString());
-	        responseElement.appendChild(msgElement);
-    	}
+        if (error_messages != null && error_messages.size() > 0){
+            StringBuilder output_msg = new StringBuilder();
+            for (String mes : error_messages){
+                output_msg.append(mes);
+            }
+            Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+            msgElement.setTextContent(output_msg.toString());
+            responseElement.appendChild(msgElement);
+        }
         return responseElement;
 
     }
-    
-    
 
     /**
-     * Helper method that translates a date object to an XMLGregorianCalendar which is the data type used in jaxb generated classes.
-     * 
-     * @param date
+     * Helper method that translates a date object to an XMLGregorianCalendar which is the data type used in jaxb generated classes
+     *
+     * @param date date
      * @return XMLGregorianCalendar
      * @throws Exception
      */
     private XMLGregorianCalendar getXMLGregorianCalendarDate(Date date) throws Exception {
-    	
+
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
         DatatypeFactory df = DatatypeFactory.newInstance();
-        XMLGregorianCalendar gcDate =
-            df.newXMLGregorianCalendarDate(gc.get(Calendar.YEAR), gc.get(Calendar.MONTH) + 1, gc.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
-        return gcDate;
+
+        return df.newXMLGregorianCalendarDate(
+                gc.get(Calendar.YEAR),
+                gc.get(Calendar.MONTH) + 1,
+                gc.get(Calendar.DAY_OF_MONTH),
+                DatatypeConstants.FIELD_UNDEFINED
+        );
     }
 
     /**
-     * Helper method that translates a date object (specifically time) to an XMLGregorianCalendar which is the data type used in jaxb generated classes.
-     * 
-     * @param date
+     * Helper method that translates a date object (specifically time) to an XMLGregorianCalendar which is the data type used in jaxb generated classes
+     *
+     * @param date date
      * @return XMLGregorianCalendar
      * @throws Exception
      */
@@ -545,73 +644,46 @@ public class StudySubjectEndpoint {
         GregorianCalendar gc = new GregorianCalendar(locale);
         gc.setTime(date);
         DatatypeFactory df = DatatypeFactory.newInstance();
-        XMLGregorianCalendar gcTime =
-            df.newXMLGregorianCalendarTime(gc.get(Calendar.HOUR_OF_DAY), gc.get(Calendar.MINUTE), gc.get(Calendar.SECOND), null,
-                    DatatypeConstants.FIELD_UNDEFINED);
-        return gcTime;
+
+        return df.newXMLGregorianCalendarTime(
+                gc.get(Calendar.HOUR_OF_DAY),
+                gc.get(Calendar.MINUTE),
+                gc.get(Calendar.SECOND),
+                null,
+                DatatypeConstants.FIELD_UNDEFINED
+        );
     }
 
     /**
-     * Helper Method to resolve a date provided as a string to a Date object.
-     * 
-     * @param dateAsString
+     * Helper Method to resolve a date provided as a string to a Date object
+     *
+     * @param dateAsString dateAsString
      * @return Date
-     * @throws ParseException
+     * @throws Exception
      */
-    private Date getDate(String dateAsString) throws ParseException, Exception {
+    private Date getDate(String dateAsString) throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
         sdf.setLenient(false);
         Date dd = sdf.parse(dateAsString);
         Calendar c = Calendar.getInstance();
         c.setTime(dd);
         if (c.get(Calendar.YEAR) < 1900 || c.get(Calendar.YEAR) > 9999) {
-        	throw new Exception("Unparsable date: "+dateAsString);
+            throw new Exception("Unparsable date: " + dateAsString);
         }
         return dd;
     }
 
     /**
      * Helper Method to get the user account
-     * 
+     *
      * @return UserAccountBean
      */
     private UserAccountBean getUserAccount() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = null;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
+        String username = principal instanceof UserDetails ? ((UserDetails) principal).getUsername() : principal.toString();
         UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
         return (UserAccountBean) userAccountDao.findByUserName(username);
     }
 
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
-    }
-
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
-
-    public UserAccountDAO getUserAccountDao() {
-        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
-        return userAccountDao;
-    }
-
-    public SubjectDAO getSubjectDao() {
-        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
-        return subjectDao;
-    }
-
-    public MessageSource getMessages() {
-        return messages;
-    }
-
+    //endregion
 }
