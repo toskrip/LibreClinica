@@ -319,7 +319,8 @@ public class OdmController {
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
                 String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
 
-        String url = enketoURL + "&" + FORM_CONTEXT + "=" + contextHash;
+        String separator = (enketoURL!= null && enketoURL.contains("?")) ? "&" : "?";
+        String url = enketoURL + separator + FORM_CONTEXT + "=" + contextHash;
         logger.debug("Enketo URL for " + crfVersion.getName() + "= " + url);
         return url;
 
@@ -331,7 +332,8 @@ public class OdmController {
                 String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid());
         String editURL = CoreResources.getField("sysURL.base") + "pages/api/v1/editform/" + studyOID + "/url";
 
-        String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;
+        String separator = (editURL.contains("?")) ? "&" : "?";
+        String url = editURL + separator + FORM_CONTEXT + "=" + contextHash;
         logger.debug("Edit URL for " + crfVersion.getName() + "= " + url);
         return url;
 
